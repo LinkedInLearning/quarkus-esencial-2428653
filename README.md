@@ -1,9 +1,9 @@
 # Quarkus esencial
-## 02.06 Compilación nativa y Contenedores con Quarkus
+## 02.05 Compilación nativa y Contenedores con Quarkus
 
-Uno de las necesidades fundamentales en los entornos de Cloud y microservicios es la utilizacion eficaz de los recursos
+Uno de las necesidades fundamentales en los entornos de Cloud y microservicios es el uso eficaz de los recursos
 de los que disponemos. 
-Quarkus y la compilacion nativa nos permite desplegar aplicaciones Java como si fuesen ejecutables nativos, por lo que
+Quarkus y la compilación nativa nos permite desplegar aplicaciones Java como si fuesen ejecutables nativos, por lo que
 no necesitamos que nuestro contendor instale ningun runtime de Java para poder ejecutarlo ya que los ejecutables nativos
 se ejecutan directamente por el sistema operativo.
 
