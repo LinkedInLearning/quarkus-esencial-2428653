@@ -1,20 +1,37 @@
 # Quarkus esencial
-## 2.04 Tu primer test unitario con Quarkus
+## 2.06 Despliegue en Kubernetes de tu primera aplicación Quarkus
 
-Una de las métricas de las que disponemos para saber que la calidad del código que vamos desarrollando y asegurar que
-no hay regresiones en funcionalidades, es disponer de una buena bateria de tests unitarios.
+Una vez sabemos como crear contenedores, vamos aprender como desplegarlos en kubernetes con Quarkus en unas lineas de comando.
 
-Quarkus dispone de una integración con JUnit 5 y otros frameworks para la escritura de nuestros tests unitarios.
-Además, dispone de una herramienta de ejecución continua de tests unitarios en modo desarrollo que permite obtener el 
-feedback de errores y regresiones posibles lo antes posible.
+En este workshop no vamos a ir al mejor lugar del mundo, como dice siempre Josh Long, que es Producción, sino que nos
+quedaremos a aprender en nuestro local.
+Utilizaremos Minikube por ser una solución popular y simple para poder hacer un despliegue sencillo de un cluster de
+Kubernetes en local. ¡No utilizar Minikube en producción!
 
-Una de las técnicas que disponemos como programadores para desarrollar tests en continuo es además Test Driver Development, o TDD, técnica 
-especialmente útil cuando trabajamos en pair programming, que utilizaré para enseñaros el framework de tests unitarios
-de Quarkus.
+* Para poder desplegar en Kubernetes tenemos que escribir la configuración YAML. La extension quarkus-kubernetes
+  nos ayuda a ello. (añadir extension)
+* cambiar las propiedades kubernetes para que el fichero yaml
+```
+quarkus.container-image.group
+quarkus.container-image.name
+quarkus.kubernetes.name
+```
+* Añadir extension minikube que nos permite generar ficheros extra para el despliegue
 
-Arrancar Quarkus en modo desarrollo de nuevo.
-* 
-* Enseñar cómo solamente se ejecutan los tests que coresponden al código que ha cambiado.
+* Primer paso arrancar minikube.
+  `minikube start --cpus 4 --memory "8192mb"`
+  Suelo darle bien de memoria y más CPUs. Para estos ejemplos utilizo minikube con el driver de docker, pero
+  VirtualBox para los usuarios de Windows y Mac es una muy buena opción.
 
-Hemos aprendido a crear tests unitarios y a utilizar el testing en continuo de Quarkus, utilizando la integracion de Quarkus
-con los populares frameworks JUnit 5 y RestAssured.
+* minikube service list comprobamos que estamos en el namespace 'default'.
+* Para empaquetar las aplicaciones y desplegarlas en kubernetes tenemos diferentes alternativas. Vamos a utilizar la extension de jib
+  https://github.com/GoogleContainerTools/jib que es una herramienta de Google por disponer de todo lo necesario.
+
+* Vamos a ejecutar el comando utilizado anteriormente crear el empaquetado en un contenedor
+  `./mvnw clean package -Dquarkus.container-image.build=true`
+
+* Para ver las images `docker images`
+* Despliegue en Kubernetes:
+  `./mvn clean package -Dquarkus.kubernetes.deploy=true`
+
+Hemos aprendido como desplegar nuestro primer servicio en un cluster de kubernetes en local. 
