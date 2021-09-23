@@ -1,5 +1,5 @@
 # Quarkus esencial
-## 2.06 Despliegue en Kubernetes de tu primera aplicación Quarkus
+## 02_06 Despliegue en Kubernetes de tu primera aplicación Quarkus
 
 Una vez sabemos como crear contenedores, vamos aprender como desplegarlos en kubernetes con Quarkus en unas lineas de comando.
 
