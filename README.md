@@ -1,20 +1,28 @@
 # Quarkus esencial
-## 2.04 Tu primer test unitario con Quarkus
+## 02.05 Compilación nativa y Contenedores con Quarkus
 
-Una de las métricas de las que disponemos para saber que la calidad del código que vamos desarrollando y asegurar que
-no hay regresiones en funcionalidades, es disponer de una buena bateria de tests unitarios.
+Uno de las necesidades fundamentales en los entornos de Cloud y microservicios es el uso eficaz de los recursos
+de los que disponemos.
+Quarkus y la compilación nativa nos permite desplegar aplicaciones Java como si fuesen ejecutables nativos, por lo que
+no necesitamos que nuestro contendor instale ningun runtime de Java para poder ejecutarlo ya que los ejecutables nativos
+se ejecutan directamente por el sistema operativo.
 
-Quarkus dispone de una integración con JUnit 5 y otros frameworks para la escritura de nuestros tests unitarios.
-Además, dispone de una herramienta de ejecución continua de tests unitarios en modo desarrollo que permite obtener el 
-feedback de errores y regresiones posibles lo antes posible.
+Veremos ahora como funciona.
 
-Una de las técnicas que disponemos como programadores para desarrollar tests en continuo es además Test Driver Development, o TDD, técnica 
-especialmente útil cuando trabajamos en pair programming, que utilizaré para enseñaros el framework de tests unitarios
-de Quarkus.
+- Tenemos que tener instalado ${GRAALVM_HOME}/bin/gu install native-image para utilizar GRAAL_VM para crear los ejecutables nativos.
+  Mac puede dar algun problema a la hora de instalar native-image, con `xattr -r -d com.apple.quarantine ${GRAALVM_HOME}/../..` se
+  soluciona el problema.
 
-Arrancar Quarkus en modo desarrollo de nuevo.
-* 
-* Enseñar cómo solamente se ejecutan los tests que coresponden al código que ha cambiado.
+* Mover el codigo a un HASHMAP en la creación de la clase
+* Cambiar el test para que si un valor no se encuentre responda 404
+* Cambiar el código para utilizar Response en vez del objeto
+* Compilar nativamente el código. Explicar en ese paso todo lo que viene en maven.
+* Hacer run del ejecutable que se ha creado
+* Vemos que hay un problema con el servicio. Explicar que la compilacion nativa borra código que no se usa.
+* Ademas ponemos el ejecutable en un container docker. La aplicacion no arranca porque estamos en mac.
+* Utilizar @RegusterForReflection para solucionar el primer problema
+* Volver a compilar esta vez utilizando el flag ./mvnw package -Pnative -Dquarkus.native.container-build=true
+* Comprobar que todo funciona
 
-Hemos aprendido a crear tests unitarios y a utilizar el testing en continuo de Quarkus, utilizando la integracion de Quarkus
-con los populares frameworks JUnit 5 y RestAssured.
+Hemos aprendido como desplegar en un contenedor con la linea de comandos y solucionado problemas comunes con los que nos encontraremos
+en caso de utilizar la compilacion nativa en vez de aplicaciones JVM. 
