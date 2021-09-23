@@ -8,10 +8,25 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 @Path("/products")
 public class ProductInventoryResource {
+
+    private Map<String, ProductInventory> inventory = new HashMap();
+
+    public ProductInventoryResource() {
+        ProductInventory productInventory = new ProductInventory("KE180");
+        productInventory.setSku("KE180");
+        productInventory.setName("K-Eco 180");
+        productInventory.setProductAvailability(ProductAvailability.IN_STOCK);
+        productInventory.setQuantity(12);
+        productInventory.setPrice(BigDecimal.valueOf(315.0));
+        inventory.put("KE180", productInventory);
+    }
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -22,13 +37,13 @@ public class ProductInventoryResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{sku}")
-    public ProductInventory inventory(@PathParam("sku") String sku) {
-        ProductInventory productInventory = new ProductInventory();
-        productInventory.setSku(sku);
-        productInventory.setName("K-Eco 180");
-        productInventory.setProductAvailability(ProductAvailability.IN_STOCK);
-        productInventory.setQuantity(12);
-        productInventory.setPrice(BigDecimal.valueOf(315.0));
-        return productInventory;
+    public Response inventory(@PathParam("sku") String sku) {
+        ProductInventory productInventory = inventory.get(sku);
+
+        if (productInventory == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(productInventory).build();
     }
 }

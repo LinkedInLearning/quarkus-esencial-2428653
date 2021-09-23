@@ -1,9 +1,12 @@
 package com.kineteco.model;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Objects;
 
+@RegisterForReflection
 public class ProductInventory {
    private String sku;
    private String category;
@@ -19,6 +22,11 @@ public class ProductInventory {
    private int unitsAvailable;
 
    public ProductInventory() {
+
+   }
+
+   public ProductInventory(String sku) {
+      this.sku = sku;
    }
 
    public ProductInventory(String sku, String category, String name, int quantity, int powerWatts, float footprint,
