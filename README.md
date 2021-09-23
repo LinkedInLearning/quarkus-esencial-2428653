@@ -1,5 +1,5 @@
 # Quarkus esencial
-## 2.04 Tu primer test unitario con Quarkus
+## 02.04 Tu primer test unitario con Quarkus
 
 Una de las métricas de las que disponemos para saber que la calidad del código que vamos desarrollando y asegurar que
 no hay regresiones en funcionalidades, es disponer de una buena bateria de tests unitarios.
@@ -13,8 +13,9 @@ especialmente útil cuando trabajamos en pair programming, que utilizaré para e
 de Quarkus.
 
 Arrancar Quarkus en modo desarrollo de nuevo.
-*
-* Enseñar cómo solamente se ejecutan los tests que coresponden al código que ha cambiado.
+* Repasar las diferentes opciones
+* Enseñar cómo solamente se ejecutan los tests que corresponden al código que ha cambiado.
+* Modificar el test unitario para cambiar el nombre del servicio
 
 Hemos aprendido a crear tests unitarios y a utilizar el testing en continuo de Quarkus, utilizando la integracion de Quarkus
 con los populares frameworks JUnit 5 y RestAssured.
