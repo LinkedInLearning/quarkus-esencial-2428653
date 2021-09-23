@@ -16,7 +16,7 @@ public class ProductInventoryResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String hello() {
-        return "Hello RESTEasy";
+        return "Product Inventory Service is up!";
     }
 
     @GET
@@ -24,7 +24,7 @@ public class ProductInventoryResource {
     @Path("/{sku}")
     public ProductInventory inventory(@PathParam("sku") String sku) {
         ProductInventory productInventory = new ProductInventory();
-        productInventory.setSku("KE180");
+        productInventory.setSku(sku);
         productInventory.setName("K-Eco 180");
         productInventory.setProductAvailability(ProductAvailability.IN_STOCK);
         productInventory.setQuantity(12);
