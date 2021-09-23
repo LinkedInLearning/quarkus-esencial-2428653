@@ -12,8 +12,8 @@ public class ProductInventory {
    private String category;
    private String name;
    private int quantity;
-   private int powerWatts;
-   private float footprint;
+   private String powerWatts;
+   private String footprint;
    private BigDecimal manufacturingCost;
    private BigDecimal price;
    private ProductLine productLine;
@@ -29,7 +29,7 @@ public class ProductInventory {
       this.sku = sku;
    }
 
-   public ProductInventory(String sku, String category, String name, int quantity, int powerWatts, float footprint,
+   public ProductInventory(String sku, String category, String name, int quantity, String powerWatts, String footprint,
                            BigDecimal manufacturingCost, BigDecimal price, ProductLine productLine,
                            ConsumerType[] targetConsumer, ProductAvailability productAvailability, int unitsAvailable) {
       this.sku = sku;
@@ -62,7 +62,7 @@ public class ProductInventory {
       if (o == null || getClass() != o.getClass())
          return false;
       ProductInventory that = (ProductInventory) o;
-      return quantity == that.quantity && powerWatts == that.powerWatts && Float.compare(that.footprint, footprint) == 0
+      return quantity == that.quantity &&  Objects.equals(powerWatts,that.powerWatts) && Objects.equals(footprint, that.footprint)
             && unitsAvailable == that.unitsAvailable && Objects.equals(sku, that.sku) && Objects
             .equals(category, that.category) && Objects.equals(name, that.name) && Objects
             .equals(manufacturingCost, that.manufacturingCost) && Objects.equals(price, that.price)
@@ -111,19 +111,19 @@ public class ProductInventory {
       this.quantity = quantity;
    }
 
-   public int getPowerWatts() {
+   public String getPowerWatts() {
       return powerWatts;
    }
 
-   public void setPowerWatts(int powerWatts) {
+   public void setPowerWatts(String powerWatts) {
       this.powerWatts = powerWatts;
    }
 
-   public float getFootprint() {
+   public String getFootprint() {
       return footprint;
    }
 
-   public void setFootprint(float footprint) {
+   public void setFootprint(String footprint) {
       this.footprint = footprint;
    }
 

@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response;
 public class ProductInventoryResource {
 
     @Inject
-    private ProductInventoryService productInventoryService;
+    ProductInventoryService productInventoryService;
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
