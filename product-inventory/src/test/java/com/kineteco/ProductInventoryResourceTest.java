@@ -1,12 +1,13 @@
 package com.kineteco;
 
+import com.kineteco.model.ConsumerType;
 import com.kineteco.model.ProductInventory;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @QuarkusTest
 public class ProductInventoryResourceTest {
@@ -22,11 +23,26 @@ public class ProductInventoryResourceTest {
 
     @Test
     public void inventoryEndpoint() {
-        ProductInventory productInventory = given().when().get("/products/{sku}", "KE180")
+        ProductInventory domesticProduct = given().when().get("/products/{sku}", "KE180")
               .then()
               .statusCode(200)
               .extract().body().as(ProductInventory.class);
-        assertEquals("KE180", productInventory.getSku());
+        assertThat(domesticProduct.getSku()).isEqualTo("KE180");
+        assertThat(domesticProduct.getTargetConsumer()).containsExactly(ConsumerType.DOMESTIC);
+
+        ProductInventory personalProduct = given().when().get("/products/{sku}", "KE5")
+              .then()
+              .statusCode(200)
+              .extract().body().as(ProductInventory.class);
+        assertThat(personalProduct.getSku()).isEqualTo("KE5");
+        assertThat(personalProduct.getTargetConsumer()).containsExactly(ConsumerType.PERSONAL);
+
+        ProductInventory corporateProduct = given().when().get("/products/{sku}", "KEBL800")
+              .then()
+              .statusCode(200).extract()
+              .body().as(ProductInventory.class);
+        assertThat(corporateProduct.getSku()).isEqualTo("KEBL800");
+        assertThat(corporateProduct.getTargetConsumer()).containsExactly(ConsumerType.CORPORATE);
 
         given().when().get("/products/{sku}", "foo")
               .then()

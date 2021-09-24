@@ -1,7 +1,10 @@
 package com.kineteco;
 
+import com.kineteco.config.ProductInventoryConfig;
 import com.kineteco.model.ProductInventory;
 import com.kineteco.service.ProductInventoryService;
+import org.eclipse.microprofile.config.Config;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -17,10 +20,16 @@ public class ProductInventoryResource {
     @Inject
     ProductInventoryService productInventoryService;
 
+//    @ConfigProperty(name = "com.kineteco.greeting-message")
+//    String message;
+
+    @Inject
+    ProductInventoryConfig productInventoryConfig;
+
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String hello() {
-        return "Product Inventory Service is up!";
+        return productInventoryConfig.greetingMessage();
     }
 
     @GET
