@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,5 +88,13 @@ public class ProductInventoryService {
 
    public ProductInventory getBySku(String sku) {
       return inventory.get(sku);
+   }
+
+   public Collection<ProductInventory> listInventory() {
+      return inventory.values();
+   }
+
+   public void addProductInventory(ProductInventory productInventory) {
+      inventory.putIfAbsent(productInventory.getSku(), productInventory);
    }
 }

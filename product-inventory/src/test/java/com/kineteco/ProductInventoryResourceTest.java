@@ -3,7 +3,10 @@ package com.kineteco;
 import com.kineteco.model.ConsumerType;
 import com.kineteco.model.ProductInventory;
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
+
+import java.util.Collection;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,7 +18,7 @@ public class ProductInventoryResourceTest {
     @Test
     public void testHelloEndpoint() {
         given()
-          .when().get("/products")
+          .when().get("/products/health")
           .then()
              .statusCode(200)
              .body(is("Product Inventory Service is up!"));
@@ -47,5 +50,37 @@ public class ProductInventoryResourceTest {
         given().when().get("/products/{sku}", "foo")
               .then()
               .statusCode(404);
+    }
+
+    @Test
+    public void testListProducts() {
+        Collection products = given().when().get("/products").then().statusCode(200).extract().body().as(Collection.class);
+        assertThat(products).size().isEqualTo(52);
+    }
+
+    @Test
+    public void testCreateProduct() {
+        given()
+              .body("{\"sku\": \"123\"}")
+              .contentType(ContentType.JSON)
+              .when()
+              .post("/products")
+              .then()
+              .statusCode(201);
+        ProductInventory corporateProduct = given().when().get("/products/{sku}", "123")
+              .then()
+              .statusCode(200).extract()
+              .body().as(ProductInventory.class);
+        assertThat(corporateProduct.getSku()).isEqualTo("123");
+    }
+
+    @Test
+    public void testUpgradeStock() {
+
+    }
+
+    @Test
+    public void testDeleteProduct() {
+
     }
 }
