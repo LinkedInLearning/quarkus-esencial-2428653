@@ -1,22 +1,22 @@
 package com.kineteco.service;
 
+import com.kineteco.model.ConsumerType;
 import com.kineteco.model.ProductAvailability;
 import com.kineteco.model.ProductInventory;
 import com.kineteco.model.ProductLine;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
-import io.quarkus.runtime.configuration.ProfileManager;
 import org.jboss.logging.Logger;
 
-import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @ApplicationScoped
@@ -54,13 +54,24 @@ public class ProductInventoryService {
             productInventory.setFootprint(values[5]);
             productInventory.setManufacturingCost(new BigDecimal(values[6].replace("$","")));
             productInventory.setPrice(new BigDecimal(values[7].replace("$","")));
-            //values[8]
-            //values[9]
-            //values[10]
+            productInventory.setProductLine(ProductLine.valueOf(values[8].toUpperCase()));
+            List<ConsumerType> targetConsumers = new ArrayList<>();
+            String toUpperCaseConsumerTypes = values[9].toUpperCase();
+            for( ConsumerType consumerType: ConsumerType.values()) {
+               parseConsumerTypes(toUpperCaseConsumerTypes, consumerType, targetConsumers);
+            }
+            productInventory.setTargetConsumer(targetConsumers);
+            productInventory.setProductAvailability(ProductAvailability.valueOf(values[10].replace(" ", "_").toUpperCase()));
             productInventory.setUnitsAvailable(Integer.parseInt(values[11]));
             inventory.put(productInventory.getSku(), productInventory);
             id++;
          }
+      }
+   }
+
+   private void parseConsumerTypes(String values, ConsumerType consumerType, List<ConsumerType> targetConsumers) {
+      if (values.contains(consumerType.name())) {
+         targetConsumers.add(consumerType);
       }
    }
 

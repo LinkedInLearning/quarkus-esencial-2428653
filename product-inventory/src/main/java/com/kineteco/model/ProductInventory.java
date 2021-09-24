@@ -3,7 +3,7 @@ package com.kineteco.model;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 @RegisterForReflection
@@ -17,7 +17,7 @@ public class ProductInventory {
    private BigDecimal manufacturingCost;
    private BigDecimal price;
    private ProductLine productLine;
-   private ConsumerType[] targetConsumer;
+   private List<ConsumerType> targetConsumer;
    private ProductAvailability productAvailability;
    private int unitsAvailable;
 
@@ -31,7 +31,7 @@ public class ProductInventory {
 
    public ProductInventory(String sku, String category, String name, int quantity, String powerWatts, String footprint,
                            BigDecimal manufacturingCost, BigDecimal price, ProductLine productLine,
-                           ConsumerType[] targetConsumer, ProductAvailability productAvailability, int unitsAvailable) {
+                           List<ConsumerType> targetConsumer, ProductAvailability productAvailability, int unitsAvailable) {
       this.sku = sku;
       this.category = category;
       this.name = name;
@@ -51,7 +51,7 @@ public class ProductInventory {
       return "ProductInventory{" + "sku='" + sku + '\'' + ", category='" + category + '\'' + ", name='" + name + '\''
             + ", quantity=" + quantity + ", powerWatts=" + powerWatts + ", footprint=" + footprint
             + ", manufacturingCost=" + manufacturingCost + ", price=" + price + ", productLine=" + productLine
-            + ", targetConsumer=" + Arrays.toString(targetConsumer) + ", productAvailability=" + productAvailability
+            + ", targetConsumer=" + targetConsumer.toString() + ", productAvailability=" + productAvailability
             + ", unitsAvailable=" + unitsAvailable + '}';
    }
 
@@ -62,21 +62,19 @@ public class ProductInventory {
       if (o == null || getClass() != o.getClass())
          return false;
       ProductInventory that = (ProductInventory) o;
-      return quantity == that.quantity &&  Objects.equals(powerWatts,that.powerWatts) && Objects.equals(footprint, that.footprint)
-            && unitsAvailable == that.unitsAvailable && Objects.equals(sku, that.sku) && Objects
-            .equals(category, that.category) && Objects.equals(name, that.name) && Objects
+      return quantity == that.quantity && Objects.equals(powerWatts, that.powerWatts) && Objects
+            .equals(footprint, that.footprint) && unitsAvailable == that.unitsAvailable && Objects.equals(sku, that.sku)
+            && Objects.equals(category, that.category) && Objects.equals(name, that.name) && Objects
             .equals(manufacturingCost, that.manufacturingCost) && Objects.equals(price, that.price)
-            && productLine == that.productLine && Arrays.equals(targetConsumer, that.targetConsumer)
+            && productLine == that.productLine && Objects.equals(targetConsumer, that.targetConsumer)
             && productAvailability == that.productAvailability;
    }
 
    @Override
    public int hashCode() {
-      int result = Objects
+      return Objects
             .hash(sku, category, name, quantity, powerWatts, footprint, manufacturingCost, price, productLine,
-                  productAvailability, unitsAvailable);
-      result = 31 * result + Arrays.hashCode(targetConsumer);
-      return result;
+                  targetConsumer, productAvailability, unitsAvailable);
    }
 
    public String getSku() {
@@ -151,11 +149,11 @@ public class ProductInventory {
       this.productLine = productLine;
    }
 
-   public ConsumerType[] getTargetConsumer() {
+   public List<ConsumerType> getTargetConsumer() {
       return targetConsumer;
    }
 
-   public void setTargetConsumer(ConsumerType[] targetConsumer) {
+   public void setTargetConsumer(List<ConsumerType> targetConsumer) {
       this.targetConsumer = targetConsumer;
    }
 
