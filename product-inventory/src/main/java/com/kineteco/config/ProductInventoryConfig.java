@@ -6,8 +6,10 @@ import io.smallrye.config.WithName;
 
 import javax.validation.constraints.Min;
 
-@ConfigMapping(prefix = "com.kineteco")
+@ConfigMapping(prefix = "kineteco")
 public interface ProductInventoryConfig {
+   String service();
+
    String greetingMessage();
 
    @WithName("full-catalog")
