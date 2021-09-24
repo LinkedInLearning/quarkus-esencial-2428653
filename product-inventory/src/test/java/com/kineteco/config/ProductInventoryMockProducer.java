@@ -1,6 +1,5 @@
 package com.kineteco.config;
 
-import com.kineteco.config.ProductInventoryConfig;
 import io.smallrye.config.SmallRyeConfig;
 import org.eclipse.microprofile.config.Config;
 
