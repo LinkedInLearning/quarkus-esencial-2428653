@@ -4,6 +4,10 @@ import com.kineteco.config.ProductInventoryConfig;
 import com.kineteco.model.ProductInventory;
 import com.kineteco.model.ValidationGroups;
 import com.kineteco.service.ProductInventoryService;
+import org.eclipse.microprofile.openapi.annotations.OpenAPIDefinition;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.info.Info;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
@@ -83,6 +87,7 @@ public class ProductInventoryResource {
 
     @PATCH
     @Path("/{sku}")
+    @Operation(summary = "Update the stock of a product by sku.", description = "Longer description that explains all.")
     public Response updateStock(@PathParam("sku") String sku, @QueryParam("stock") Integer stock) {
         LOGGER.debugf("get by sku %s", sku);
         ProductInventory productInventory = productInventoryService.stockUpdate(sku, stock);
