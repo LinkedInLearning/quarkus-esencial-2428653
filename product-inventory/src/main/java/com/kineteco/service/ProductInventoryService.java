@@ -70,6 +70,7 @@ public class ProductInventoryService {
       } catch (Exception e) {
          System.out.println(e);
       }
+      System.out.println("===========> loaded " + inventory.size());
    }
 
    private void parseConsumerTypes(String values, ConsumerType consumerType, List<ConsumerType> targetConsumers) {
