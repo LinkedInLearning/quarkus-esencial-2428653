@@ -6,7 +6,6 @@ import com.kineteco.model.ProductInventory;
 import com.kineteco.model.ProductLine;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
-import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -22,16 +21,13 @@ import java.util.Map;
 @ApplicationScoped
 public class ProductInventoryService {
    private Map<String, ProductInventory> inventory = new HashMap();
-   private static final Logger LOGGER = Logger.getLogger(ProductInventoryService.class);
 
    void onStart(@Observes StartupEvent ev) {
-      LOGGER.info("Product Inventory Service is starting Powered by Quarkus");
+      System.out.println("==========> onStart");
       try {
          loadData();
       } catch (Exception e) {
-         LOGGER.info("Loaded " + inventory.size());
-         LOGGER.error("Unable to load catalog.", e);
-
+         System.out.println(e);
       }
    }
 
@@ -76,7 +72,7 @@ public class ProductInventoryService {
    }
 
    void onStop(@Observes ShutdownEvent ev) {
-      LOGGER.info("Product Inventory Service shutting down...");
+      System.out.println("===========> onStop");
    }
 
    public ProductInventory getBySku(String sku) {
