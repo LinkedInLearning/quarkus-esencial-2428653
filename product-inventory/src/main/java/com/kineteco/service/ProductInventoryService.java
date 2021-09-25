@@ -24,8 +24,9 @@ import java.util.Map;
 
 @ApplicationScoped
 public class ProductInventoryService {
-   private Map<String, ProductInventory> inventory = new HashMap();
    private static final Logger LOGGER = Logger.getLogger(ProductInventoryService.class);
+
+   private Map<String, ProductInventory> inventory = new HashMap();
 
    @Inject
    ProductInventoryConfig productInventoryConfig;
@@ -96,5 +97,21 @@ public class ProductInventoryService {
 
    public void addProductInventory(ProductInventory productInventory) {
       inventory.putIfAbsent(productInventory.getSku(), productInventory);
+   }
+
+   public void updateProductInventory(ProductInventory productInventory) {
+      inventory.put(productInventory.getSku(), productInventory);
+   }
+
+   public ProductInventory stockUpdate(String sku, Integer stock) {
+      ProductInventory productInventory = inventory.get(sku);
+      if (productInventory != null) {
+         productInventory.setUnitsAvailable(productInventory.getUnitsAvailable() + stock);
+      }
+      return productInventory;
+   }
+
+   public void delete(String sku) {
+      inventory.remove(sku);
    }
 }
