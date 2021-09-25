@@ -61,7 +61,7 @@ public class ProductInventoryResourceTest {
     @Test
     public void testCRUD() {
         given()
-              .body("{\"sku\": \"123\"}")
+              .body("{\"sku\": \"123\", \"name\": \"Super Productttt\"}")
               .contentType(ContentType.JSON)
               .when()
               .post("/products")
@@ -73,10 +73,10 @@ public class ProductInventoryResourceTest {
               .statusCode(200).extract()
               .body().as(ProductInventory.class);
         assertThat(createdProduct.getSku()).isEqualTo("123");
-        assertThat(createdProduct.getName()).isNull();
+        assertThat(createdProduct.getName()).isEqualTo("Super Productttt");
 
         given()
-              .body("{\"sku\": \"123\", \"name\": \"Super Product\" }")
+              .body("{\"name\": \"Super Product\" }")
               .contentType(ContentType.JSON)
               .when()
               .put("/products/{sku}", "123")

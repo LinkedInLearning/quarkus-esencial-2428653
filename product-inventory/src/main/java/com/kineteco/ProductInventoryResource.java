@@ -2,10 +2,13 @@ package com.kineteco;
 
 import com.kineteco.config.ProductInventoryConfig;
 import com.kineteco.model.ProductInventory;
+import com.kineteco.model.ValidationGroups;
 import com.kineteco.service.ProductInventoryService;
 import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
+import javax.validation.groups.ConvertGroup;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -62,7 +65,7 @@ public class ProductInventoryResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createProduct(ProductInventory productInventory) {
+    public Response createProduct(@Valid @ConvertGroup(to = ValidationGroups.Post.class) ProductInventory productInventory) {
         LOGGER.debugf("create %s", productInventory);
         productInventoryService.addProductInventory(productInventory);
         return Response.created(URI.create(productInventory.getSku())).build();
@@ -71,7 +74,8 @@ public class ProductInventoryResource {
     @PUT
     @Path("/{sku}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateProduct(ProductInventory productInventory) {
+    public Response updateProduct(@PathParam("sku") String sku, @Valid @ConvertGroup(to = ValidationGroups.Put.class) ProductInventory productInventory) {
+        productInventory.setSku(sku);
         LOGGER.debugf("update %s", productInventory);
         productInventoryService.updateProductInventory(productInventory);
         return Response.accepted(URI.create(productInventory.getSku())).build();

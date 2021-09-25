@@ -2,6 +2,9 @@ package com.kineteco.model;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Null;
+import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +12,14 @@ import java.util.Objects;
 
 @RegisterForReflection
 public class ProductInventory {
+
+   @Null(groups = ValidationGroups.Put.class)
+   @NotBlank(groups = ValidationGroups.Post.class)
    private String sku;
+
    private String category;
+
+   @NotBlank(message = "Name is mandatory and should be provided")
    private String name;
    private int quantity;
    private String powerWatts;
@@ -20,6 +29,8 @@ public class ProductInventory {
    private ProductLine productLine;
    private List<ConsumerType> targetConsumer = new ArrayList<>();
    private ProductAvailability productAvailability;
+
+   @PositiveOrZero
    private int unitsAvailable;
 
    public ProductInventory() {
