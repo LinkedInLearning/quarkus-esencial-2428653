@@ -3,6 +3,7 @@ package com.kineteco;
 import com.kineteco.config.ProductInventoryConfig;
 import com.kineteco.model.ProductInventory;
 import com.kineteco.service.ProductInventoryService;
+import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -14,6 +15,7 @@ import javax.ws.rs.core.Response;
 
 @Path("/products")
 public class ProductInventoryResource {
+    private static final Logger LOGGER = Logger.getLogger(ProductInventoryResource.class);
 
     @Inject
     ProductInventoryService productInventoryService;
@@ -23,7 +25,9 @@ public class ProductInventoryResource {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String hello() {
+    @Path("/health")
+    public String health() {
+        LOGGER.debug("health called");
         return productInventoryConfig.greetingMessage();
     }
 
@@ -31,6 +35,7 @@ public class ProductInventoryResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{sku}")
     public Response inventory(@PathParam("sku") String sku) {
+        LOGGER.debugf("get by sku %s", sku);
         ProductInventory productInventory = productInventoryService.getBySku(sku);
 
         if (productInventory == null) {

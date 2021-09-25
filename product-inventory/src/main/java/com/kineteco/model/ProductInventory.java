@@ -3,6 +3,7 @@ package com.kineteco.model;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,7 +18,7 @@ public class ProductInventory {
    private BigDecimal manufacturingCost;
    private BigDecimal price;
    private ProductLine productLine;
-   private List<ConsumerType> targetConsumer;
+   private List<ConsumerType> targetConsumer = new ArrayList<>();
    private ProductAvailability productAvailability;
    private int unitsAvailable;
 

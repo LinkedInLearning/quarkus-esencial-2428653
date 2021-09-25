@@ -3,7 +3,10 @@ package com.kineteco;
 import com.kineteco.model.ConsumerType;
 import com.kineteco.model.ProductInventory;
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
+
+import java.util.Collection;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,9 +16,9 @@ import static org.hamcrest.CoreMatchers.is;
 public class ProductInventoryResourceTest {
 
     @Test
-    public void testHelloEndpoint() {
+    public void testHealthEndpoint() {
         given()
-          .when().get("/products")
+          .when().get("/products/health")
           .then()
              .statusCode(200)
              .body(is("Product Inventory Service is up!"));
