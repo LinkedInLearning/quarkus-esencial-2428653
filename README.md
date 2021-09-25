@@ -12,6 +12,8 @@ Introducción en power point.
   - Quarkus recomienda el uso de privado en paquete de los atributos inyectados porque eso permite que Quarkus pueda inyectar el bean sin utilizar
     reflexion. Es recomendable evitar la reflection lo máximo posible para tener mejor rendimiento.
 * Comprobamos que nuestros tests siguen funcionando
+* Añadimos un test unitario para probar específicamente ProductInventoryService e inyectamos el servicio
+
 
 Hemos aprendido más cómo utilizar la inyección de dependencias con CDI y cómo funciona en Quarkus.
 Utilizaremos la inyección de dependencias y las anotaciones continuamente con las diferentes extensiones de Quarkus.
