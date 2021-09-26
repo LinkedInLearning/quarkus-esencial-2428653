@@ -64,7 +64,7 @@ public class ProductInventoryResource {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    @Path("/{productLine}")
+    @Path("/line/{productLine}")
     public Response economyProductsCount(@PathParam("productLine") ProductLine productLine) {
         LOGGER.debug("Economy products");
         return Response.ok(ProductInventory.count("productLine", productLine)).build();
