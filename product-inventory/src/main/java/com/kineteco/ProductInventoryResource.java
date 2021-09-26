@@ -28,7 +28,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Path("/products")
@@ -58,6 +57,10 @@ public class ProductInventoryResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response listInventory() {
         LOGGER.debug("Product inventory list");
+        if(productInventoryConfig.retrieveFullCatalog()) {
+            return Response.ok(ProductInventory.findAll().list()).build();
+        }
+
         return Response.ok(ProductInventory.<ProductInventory>streamAll()
               .filter(pi -> pi.targetConsumer.contains(ConsumerType.CORPORATE)).collect(Collectors.toList())).build();
     }
@@ -85,6 +88,20 @@ public class ProductInventoryResource {
         }
 
         return Response.ok(productInventory).build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{sku}/stock")
+    public Response stock(@PathParam("sku") String sku) {
+        LOGGER.debugf("get by sku %s", sku);
+        ProductInventory productInventory = ProductInventory.findById(sku);
+        Integer stock = 0;
+        if (productInventory != null && (productInventoryConfig.retrieveFullCatalog()
+              || productInventory.targetConsumer.contains(ConsumerType.CORPORATE))) {
+            stock = productInventory.unitsAvailable;
+        }
+        return Response.ok(stock).build();
     }
 
     @POST
