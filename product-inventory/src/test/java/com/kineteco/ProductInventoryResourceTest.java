@@ -30,22 +30,22 @@ public class ProductInventoryResourceTest {
               .then()
               .statusCode(200)
               .extract().body().as(ProductInventory.class);
-        assertThat(domesticProduct.getSku()).isEqualTo("KE180");
-        assertThat(domesticProduct.getTargetConsumer()).containsExactly(ConsumerType.DOMESTIC);
+        assertThat(domesticProduct.sku).isEqualTo("KE180");
+        assertThat(domesticProduct.targetConsumer).containsExactly(ConsumerType.DOMESTIC);
 
         ProductInventory personalProduct = given().when().get("/products/{sku}", "KE5")
               .then()
               .statusCode(200)
               .extract().body().as(ProductInventory.class);
-        assertThat(personalProduct.getSku()).isEqualTo("KE5");
-        assertThat(personalProduct.getTargetConsumer()).containsExactly(ConsumerType.PERSONAL);
+        assertThat(personalProduct.sku).isEqualTo("KE5");
+        assertThat(personalProduct.targetConsumer).containsExactly(ConsumerType.PERSONAL);
 
         ProductInventory corporateProduct = given().when().get("/products/{sku}", "KEBL800")
               .then()
               .statusCode(200).extract()
               .body().as(ProductInventory.class);
-        assertThat(corporateProduct.getSku()).isEqualTo("KEBL800");
-        assertThat(corporateProduct.getTargetConsumer()).containsExactly(ConsumerType.CORPORATE);
+        assertThat(corporateProduct.sku).isEqualTo("KEBL800");
+        assertThat(corporateProduct.targetConsumer).containsExactly(ConsumerType.CORPORATE);
 
         given().when().get("/products/{sku}", "foo")
               .then()
@@ -72,8 +72,8 @@ public class ProductInventoryResourceTest {
               .then()
               .statusCode(200).extract()
               .body().as(ProductInventory.class);
-        assertThat(createdProduct.getSku()).isEqualTo("123");
-        assertThat(createdProduct.getName()).isEqualTo("Super Productttt");
+        assertThat(createdProduct.sku).isEqualTo("123");
+        assertThat(createdProduct.name).isEqualTo("Super Productttt");
 
         given()
               .body("{\"name\": \"Super Product\" }")
@@ -88,8 +88,8 @@ public class ProductInventoryResourceTest {
               .statusCode(200).extract()
               .body().as(ProductInventory.class);
 
-        assertThat(updatedProduct.getSku()).isEqualTo("123");
-        assertThat(updatedProduct.getName()).isEqualTo("Super Product");
+        assertThat(updatedProduct.sku).isEqualTo("123");
+        assertThat(updatedProduct.name).isEqualTo("Super Product");
 
         given().when().delete("/products/{sku}", "123")
               .then()
@@ -120,7 +120,7 @@ public class ProductInventoryResourceTest {
               .statusCode(200)
               .extract().body().as(ProductInventory.class);
 
-        assertThat(productInventoryAfter.getUnitsAvailable()).isEqualTo(productInventoryPre.getUnitsAvailable() + 3);
+        assertThat(productInventoryAfter.unitsAvailable).isEqualTo(productInventoryPre.unitsAvailable + 3);
     }
 
 }
