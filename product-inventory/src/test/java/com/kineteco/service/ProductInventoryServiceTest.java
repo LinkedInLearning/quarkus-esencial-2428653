@@ -24,8 +24,6 @@ public class ProductInventoryServiceTest {
    public void testLoadDataFullCatalog() {
       when(productInventoryConfig.retrieveFullCatalog()).thenReturn(true);
 
-      service.loadData();
-
       assertThat(service.getBySku("KE180")).isNotNull();
       assertThat(service.getBySku("KE180").getTargetConsumer()).containsExactly(ConsumerType.DOMESTIC);
 
@@ -39,8 +37,6 @@ public class ProductInventoryServiceTest {
    @Test
    public void testLoadDataCorporate() {
       when(productInventoryConfig.retrieveFullCatalog()).thenReturn(false);
-
-      service.loadData();
 
       assertThat(service.getBySku("KE180")).isNull();
       assertThat(service.getBySku("KE5")).isNull();

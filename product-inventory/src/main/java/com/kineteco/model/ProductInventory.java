@@ -1,7 +1,13 @@
 package com.kineteco.model;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.PositiveOrZero;
@@ -11,27 +17,32 @@ import java.util.List;
 import java.util.Objects;
 
 @RegisterForReflection
-public class ProductInventory {
+@Entity
+public class ProductInventory extends PanacheEntityBase {
 
+   @Id
    @Null(groups = ValidationGroups.Put.class)
    @NotBlank(groups = ValidationGroups.Post.class)
-   private String sku;
+   public String sku;
 
-   private String category;
+   public String category;
 
    @NotBlank(message = "Name is mandatory and should be provided")
-   private String name;
-   private int quantity;
-   private String powerWatts;
-   private String footprint;
-   private BigDecimal manufacturingCost;
-   private BigDecimal price;
-   private ProductLine productLine;
+   public String name;
+   public int quantity = 0;
+   public String powerWatts = "0";
+   public String footprint ="0";
+   public BigDecimal manufacturingCost;
+   public BigDecimal price;
+   @Enumerated(EnumType.STRING)
+   public ProductLine productLine = ProductLine.ECONOMY;
+   @Convert(converter = ConsumerTypeListConverter.class)
    private List<ConsumerType> targetConsumer = new ArrayList<>();
-   private ProductAvailability productAvailability;
+   @Enumerated(EnumType.STRING)
+   public ProductAvailability productAvailability = ProductAvailability.ON_BACK_ORDER;
 
    @PositiveOrZero
-   private int unitsAvailable;
+   public int unitsAvailable = 0;
 
    public ProductInventory() {
 
