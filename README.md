@@ -16,7 +16,7 @@ Para ello utilizaremos la estrategia Retry.
   fallar definitivamente
 - delay: indica cuanto tiempo debe esperarse entre 
 - retryOn: permite filtrar el tipo de excepción por la que queremos re intentarlo. Al utilizar la estrategia timeout,
-si ponemos la excepción se re intentará la llamada en caso de obtener un TimeoutException gestionado por Timeout.
+si ponemos la excepción se intentará de nuevo la llamada en caso de obtener un TimeoutException gestionado por Timeout.
 - jitter permite incrementar o decremetar el intervalo de tiempos entre las llamadas.
 
 
