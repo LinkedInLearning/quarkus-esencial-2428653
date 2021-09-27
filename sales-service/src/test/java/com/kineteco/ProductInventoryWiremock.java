@@ -25,6 +25,13 @@ public class ProductInventoryWiremock implements QuarkusTestResourceLifecycleMan
             .withBody("42")
         ));
 
+    stubFor(get(urlEqualTo("/products/falloTimeout/stock"))
+          .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withFixedDelay(2000)
+                .withBody("42")
+          ));
+
     return Collections.singletonMap("kineteco-product-inventory/mp-rest/url", wireMockServer.baseUrl());
   }
 
