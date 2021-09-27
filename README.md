@@ -1,3 +1,3 @@
 # Quarkus esencial
-## 07_03 Tolerancia a fallos con Quarkus: Fallback
+## 07_04 Tolerancia a fallos con Quarkus: Fallback
 
