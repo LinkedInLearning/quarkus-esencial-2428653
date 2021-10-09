@@ -2,6 +2,7 @@ package com.kineteco;
 
 import org.eclipse.microprofile.faulttolerance.ExecutionContext;
 import org.eclipse.microprofile.faulttolerance.FallbackHandler;
+import org.eclipse.microprofile.faulttolerance.exceptions.BulkheadException;
 import org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenException;
 import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException;
 
@@ -17,6 +18,10 @@ public class SalesServiceFallbackHandler implements FallbackHandler<Response> {
 
       if (context.getFailure() instanceof CircuitBreakerOpenException) {
          return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+      }
+
+      if (context.getFailure() instanceof BulkheadException) {
+         return Response.status(Response.Status.TOO_MANY_REQUESTS).build();
       }
 
       return Response.serverError().build();

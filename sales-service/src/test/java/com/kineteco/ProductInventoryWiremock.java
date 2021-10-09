@@ -20,73 +20,86 @@ public class ProductInventoryWiremock implements QuarkusTestResourceLifecycleMan
     wireMockServer = new WireMockServer();
     wireMockServer.start();
 
-    stubFor(get(urlEqualTo("/products/123/stock"))
-        .willReturn(aResponse()
-            .withHeader("Content-Type", "application/json")
-            .withBody("42")
-        ));
+     stubStock();
+     stubTimeoutStock();
+     stubGetProducts();
+     stubCircuitBreakerGetProducts();
 
-    stubFor(get(urlEqualTo("/products/falloTimeout/stock"))
-          .willReturn(aResponse()
-                .withHeader("Content-Type", "application/json")
-                .withFixedDelay(2000)
-                .withBody("42")
-          ));
+     return Collections.singletonMap("kineteco-product-inventory/mp-rest/url", wireMockServer.baseUrl());
+  }
 
-    stubFor(get(urlEqualTo("/products/deluxe"))
-          .willReturn(aResponse()
-                .withHeader("Content-Type", "application/json")
-                .withBody("{\"sku\": \"deluxe\", \"productLine\": \"DELUXE\"}")
-          ));
+   private void stubCircuitBreakerGetProducts() {
+      // Circuit breaker scenario
+      stubFor(get(urlEqualTo("/products/circuitBreaker"))
+            .inScenario("circuitBreaker")
+            .whenScenarioStateIs(Scenario.STARTED)
+            .willSetStateTo("timeout-1")
+            .willReturn(aResponse()
+                  .withHeader("Content-Type", "application/json")
+                  .withBody("{\"sku\": \"circuitBreaker\", \"productLine\": \"DELUXE\"}")
+            ));
 
-     stubFor(get(urlEqualTo("/products/economy"))
+      // Da un timeout 1 vez
+      stubFor(get(urlEqualTo("/products/circuitBreaker"))
+            .inScenario("circuitBreaker")
+            .whenScenarioStateIs("timeout-1")
+            .willSetStateTo("timeout-2")
+            .willReturn(aResponse()
+                  .withHeader("Content-Type", "application/json")
+                  .withFixedDelay(2000)
+            ));
+
+      // Da un timeout 2 vez
+      stubFor(get(urlEqualTo("/products/circuitBreaker"))
+            .inScenario("circuitBreaker")
+            .whenScenarioStateIs("timeout-2")
+            .willSetStateTo("success")
+            .willReturn(aResponse()
+                  .withHeader("Content-Type", "application/json")
+                  .withFixedDelay(2000)
+            ));
+
+      stubFor(get(urlEqualTo("/products/circuitBreaker"))
+            .inScenario("circuitBreaker")
+            .whenScenarioStateIs("success")
+            .willReturn(aResponse()
+                  .withHeader("Content-Type", "application/json")
+                  .withBody("{\"sku\": \"circuitBreaker\", \"productLine\": \"DELUXE\"}")
+            ));
+   }
+
+   private void stubGetProducts() {
+      stubFor(get(urlEqualTo("/products/deluxe"))
            .willReturn(aResponse()
-                       .withHeader("Content-Type", "application/json")
-                       .withBody("{\"sku\": \"economy\", \"productLine\": \"ECONOMY\"}")
+                 .withHeader("Content-Type", "application/json")
+                 .withBody("{\"sku\": \"deluxe\", \"productLine\": \"DELUXE\"}")
            ));
 
-    // Circuit breaker scenario
-    stubFor(get(urlEqualTo("/products/circuitBreaker"))
-          .inScenario("circuitBreaker")
-          .whenScenarioStateIs(Scenario.STARTED)
-          .willSetStateTo("timeout-1")
-          .willReturn(aResponse()
-                .withHeader("Content-Type", "application/json")
-                .withBody("{\"sku\": \"circuitBreaker\", \"productLine\": \"DELUXE\"}")
-          ));
+      stubFor(get(urlEqualTo("/products/economy"))
+            .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{\"sku\": \"economy\", \"productLine\": \"ECONOMY\"}")
+            ));
+   }
 
-    // Da un timeout 1 vez
-    stubFor(get(urlEqualTo("/products/circuitBreaker"))
-          .inScenario("circuitBreaker")
-          .whenScenarioStateIs("timeout-1")
-          .willSetStateTo("timeout-2")
-          .willReturn(aResponse()
-                .withHeader("Content-Type", "application/json")
-                .withFixedDelay(2000)
-          ));
-
-     // Da un timeout 2 vez
-     stubFor(get(urlEqualTo("/products/circuitBreaker"))
-           .inScenario("circuitBreaker")
-           .whenScenarioStateIs("timeout-2")
-           .willSetStateTo("success")
+   private void stubTimeoutStock() {
+      stubFor(get(urlEqualTo("/products/falloTimeout/stock"))
            .willReturn(aResponse()
                  .withHeader("Content-Type", "application/json")
                  .withFixedDelay(2000)
+                 .withBody("42")
            ));
+   }
 
-     stubFor(get(urlEqualTo("/products/circuitBreaker"))
-           .inScenario("circuitBreaker")
-           .whenScenarioStateIs("success")
-           .willReturn(aResponse()
-                 .withHeader("Content-Type", "application/json")
-                 .withBody("{\"sku\": \"circuitBreaker\", \"productLine\": \"DELUXE\"}")
-           ));
+   private void stubStock() {
+      stubFor(get(urlEqualTo("/products/123/stock"))
+          .willReturn(aResponse()
+              .withHeader("Content-Type", "application/json")
+              .withBody("42")
+          ));
+   }
 
-    return Collections.singletonMap("kineteco-product-inventory/mp-rest/url", wireMockServer.baseUrl());
-  }
-
-  @Override
+   @Override
   public void stop() {
     if (null != wireMockServer) {
       wireMockServer.stop();
