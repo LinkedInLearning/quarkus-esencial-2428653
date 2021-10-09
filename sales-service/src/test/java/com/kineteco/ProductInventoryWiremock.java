@@ -1,6 +1,7 @@
 package com.kineteco;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.stubbing.Scenario;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 
 import java.util.Collections;
@@ -31,6 +32,56 @@ public class ProductInventoryWiremock implements QuarkusTestResourceLifecycleMan
                 .withFixedDelay(2000)
                 .withBody("42")
           ));
+
+    stubFor(get(urlEqualTo("/products/deluxe"))
+          .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"sku\": \"deluxe\", \"productLine\": \"DELUXE\"}")
+          ));
+
+     stubFor(get(urlEqualTo("/products/economy"))
+           .willReturn(aResponse()
+                       .withHeader("Content-Type", "application/json")
+                       .withBody("{\"sku\": \"economy\", \"productLine\": \"ECONOMY\"}")
+           ));
+
+    // Circuit breaker scenario
+    stubFor(get(urlEqualTo("/products/circuitBreaker"))
+          .inScenario("circuitBreaker")
+          .whenScenarioStateIs(Scenario.STARTED)
+          .willSetStateTo("timeout-1")
+          .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"sku\": \"circuitBreaker\", \"productLine\": \"DELUXE\"}")
+          ));
+
+    // Da un timeout 1 vez
+    stubFor(get(urlEqualTo("/products/circuitBreaker"))
+          .inScenario("circuitBreaker")
+          .whenScenarioStateIs("timeout-1")
+          .willSetStateTo("timeout-2")
+          .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withFixedDelay(2000)
+          ));
+
+     // Da un timeout 2 vez
+     stubFor(get(urlEqualTo("/products/circuitBreaker"))
+           .inScenario("circuitBreaker")
+           .whenScenarioStateIs("timeout-2")
+           .willSetStateTo("success")
+           .willReturn(aResponse()
+                 .withHeader("Content-Type", "application/json")
+                 .withFixedDelay(2000)
+           ));
+
+     stubFor(get(urlEqualTo("/products/circuitBreaker"))
+           .inScenario("circuitBreaker")
+           .whenScenarioStateIs("success")
+           .willReturn(aResponse()
+                 .withHeader("Content-Type", "application/json")
+                 .withBody("{\"sku\": \"circuitBreaker\", \"productLine\": \"DELUXE\"}")
+           ));
 
     return Collections.singletonMap("kineteco-product-inventory/mp-rest/url", wireMockServer.baseUrl());
   }

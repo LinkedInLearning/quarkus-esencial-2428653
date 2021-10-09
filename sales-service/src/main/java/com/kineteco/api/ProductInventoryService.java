@@ -21,4 +21,9 @@ public interface ProductInventoryService {
    @Timeout(value = 100)
    @Retry(retryOn = TimeoutException.class, delay = 100, jitter = 25)
    Integer getStock(@PathParam("sku") String sku);
+
+   @GET
+   @Path("/{sku}")
+   @Timeout(value = 100)
+   Product inventory(@PathParam("sku") String sku);
 }
