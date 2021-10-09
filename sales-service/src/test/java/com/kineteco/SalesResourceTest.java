@@ -40,9 +40,17 @@ public class SalesResourceTest {
    @Test
    public void testAvailabilityTimeout() {
       given()
-            .queryParam("units", 43)
+            .queryParam("units", 6)
             .when().get("/sales/{sku}/availability", "falloTimeout")
             .then()
-            .statusCode(500);
+            .statusCode(200)
+            .body(is("false"));
+
+      given()
+            .queryParam("units", 5)
+            .when().get("/sales/{sku}/availability", "falloTimeout")
+            .then()
+            .statusCode(200)
+            .body(is("true"));
    }
 }
