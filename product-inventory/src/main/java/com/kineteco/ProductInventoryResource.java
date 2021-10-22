@@ -7,6 +7,10 @@ import com.kineteco.model.ProductLine;
 import com.kineteco.model.ValidationGroups;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
+import io.smallrye.common.annotation.Blocking;
+import io.smallrye.common.annotation.NonBlocking;
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.jboss.logging.Logger;
 
@@ -28,6 +32,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Path("/products")
@@ -48,21 +53,27 @@ public class ProductInventoryResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/health")
+    @NonBlocking
     public String health() {
         LOGGER.debug("health called");
+        Boolean.parseBoolean(null);
         return productInventoryConfig.greetingMessage();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response listInventory() {
+    @Blocking
+    public Uni<List<ProductInventory>> listInventory() {
         LOGGER.debug("Product inventory list");
-        if(productInventoryConfig.retrieveFullCatalog()) {
-            return Response.ok(ProductInventory.findAll().list()).build();
+        List<ProductInventory> inventoryList;
+        if (productInventoryConfig.retrieveFullCatalog()) {
+            inventoryList = ProductInventory.findAll().list();
+        } else {
+            inventoryList = ProductInventory.<ProductInventory>streamAll()
+                  .filter(pi -> pi.targetConsumer.contains(ConsumerType.CORPORATE)).collect(Collectors.toList());
         }
 
-        return Response.ok(ProductInventory.<ProductInventory>streamAll()
-              .filter(pi -> pi.targetConsumer.contains(ConsumerType.CORPORATE)).collect(Collectors.toList())).build();
+        return Uni.createFrom().item(inventoryList);
     }
 
     @GET
