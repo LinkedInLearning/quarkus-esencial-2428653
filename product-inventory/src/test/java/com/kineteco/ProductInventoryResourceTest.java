@@ -25,6 +25,12 @@ public class ProductInventoryResourceTest {
     }
 
     @Test
+    public void testListProducts() {
+        Collection products = given().when().get("/products").then().statusCode(200).extract().body().as(Collection.class);
+        assertThat(products).size().isGreaterThanOrEqualTo(52);
+    }
+
+    @Test
     public void inventoryEndpoint() {
         ProductInventory domesticProduct = given().when().get("/products/{sku}", "KE180")
               .then()
@@ -50,12 +56,6 @@ public class ProductInventoryResourceTest {
         given().when().get("/products/{sku}", "foo")
               .then()
               .statusCode(404);
-    }
-
-    @Test
-    public void testListProducts() {
-        Collection products = given().when().get("/products").then().statusCode(200).extract().body().as(Collection.class);
-        assertThat(products).size().isGreaterThanOrEqualTo(52);
     }
 
     @Test

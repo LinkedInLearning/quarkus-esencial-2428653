@@ -77,14 +77,6 @@ public class ProductInventoryResource {
     }
 
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    @Path("/line/{productLine}")
-    public Response economyProductsCount(@PathParam("productLine") ProductLine productLine) {
-        LOGGER.debug("Economy products");
-        return Response.ok(ProductInventory.count("productLine", productLine)).build();
-    }
-
-    @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{sku}")
     public Response inventory(@PathParam("sku") String sku) {
@@ -99,20 +91,6 @@ public class ProductInventoryResource {
         }
 
         return Response.ok(productInventory).build();
-    }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{sku}/stock")
-    public Response stock(@PathParam("sku") String sku) {
-        LOGGER.debugf("get by sku %s", sku);
-        ProductInventory productInventory = ProductInventory.findById(sku);
-        Integer stock = 0;
-        if (productInventory != null && (productInventoryConfig.retrieveFullCatalog()
-              || productInventory.targetConsumer.contains(ConsumerType.CORPORATE))) {
-            stock = productInventory.unitsAvailable;
-        }
-        return Response.ok(stock).build();
     }
 
     @POST
@@ -142,6 +120,37 @@ public class ProductInventoryResource {
         return Response.accepted(URI.create(productInventory.sku)).build();
     }
 
+    @DELETE
+    @Path("/{sku}")
+    @Transactional
+    public Response delete(@PathParam("sku") String sku) {
+        LOGGER.debugf("delete by sku %s", sku);
+        ProductInventory.deleteById(sku);
+        return Response.accepted().build();
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/line/{productLine}")
+    public Response economyProductsCount(@PathParam("productLine") ProductLine productLine) {
+        LOGGER.debug("Economy products");
+        return Response.ok(ProductInventory.count("productLine", productLine)).build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{sku}/stock")
+    public Response stock(@PathParam("sku") String sku) {
+        LOGGER.debugf("get by sku %s", sku);
+        ProductInventory productInventory = ProductInventory.findById(sku);
+        Integer stock = 0;
+        if (productInventory != null && (productInventoryConfig.retrieveFullCatalog()
+              || productInventory.targetConsumer.contains(ConsumerType.CORPORATE))) {
+            stock = productInventory.unitsAvailable;
+        }
+        return Response.ok(stock).build();
+    }
+
     @PATCH
     @Path("/{sku}")
     @Operation(summary = "Update the stock of a product by sku.", description = "Longer description that explains all.")
@@ -157,15 +166,6 @@ public class ProductInventoryResource {
         productInventory.unitsAvailable = productInventory.unitsAvailable + stock;
         productInventory.persist();
         return Response.accepted(URI.create(productInventory.sku)).build();
-    }
-
-    @DELETE
-    @Path("/{sku}")
-    @Transactional
-    public Response delete(@PathParam("sku") String sku) {
-        LOGGER.debugf("delete by sku %s", sku);
-        ProductInventory.deleteById(sku);
-        return Response.accepted().build();
     }
 
 }
