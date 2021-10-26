@@ -22,7 +22,7 @@ public class ProductInventoryResourceTest {
 
     @Test
     public void inventoryEndpoint() {
-        ProductInventory productInventory = given().when().get("/products/{sku}", "KE180").then().statusCode(200).extract().body()
+        ProductInventory productInventory = given().when().get("/products/KE180").then().statusCode(200).extract().body()
               .as(ProductInventory.class);
         assertEquals("KE180", productInventory.getSku());
     }
