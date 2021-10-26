@@ -10,7 +10,7 @@ import javax.ws.rs.core.MediaType;
 import java.math.BigDecimal;
 
 @Path("/hello")
-public class GreetingResource {
+public class ProductsInventoryResource {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
