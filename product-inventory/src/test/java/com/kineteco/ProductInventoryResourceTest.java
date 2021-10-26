@@ -27,9 +27,5 @@ public class ProductInventoryResourceTest {
               .statusCode(200)
               .extract().body().as(ProductInventory.class);
         assertEquals("KE180", productInventory.getSku());
-
-        given().when().get("/products/{sku}", "foo")
-              .then()
-              .statusCode(404);
     }
 }

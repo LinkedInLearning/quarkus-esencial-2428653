@@ -13,15 +13,22 @@ Veremos ahora como funciona.
   Mac puede dar algun problema a la hora de instalar native-image, con `xattr -r -d com.apple.quarantine ${GRAALVM_HOME}/../..` se
   soluciona el problema.
 
-* Mover el codigo a un HASHMAP en la creación de la clase
-* Cambiar el test para que si un valor no se encuentre responda 404
+* Mover el código a un HASHMAP en la creación de la clase
 * Cambiar el código para utilizar Response en vez del objeto
 * Compilar nativamente el código. Explicar en ese paso todo lo que viene en maven.
+  ```shell
+  ./mvnw package -Pnative
+  ```
 * Hacer run del ejecutable que se ha creado
-* Vemos que hay un problema con el servicio. Explicar que la compilacion nativa borra código que no se usa.
-* Ademas ponemos el ejecutable en un container docker. La aplicacion no arranca porque estamos en mac.
-* Utilizar @RegusterForReflection para solucionar el primer problema
-* Volver a compilar esta vez utilizando el flag ./mvnw package -Pnative -Dquarkus.native.container-build=true
+* Vemos que hay un problema con el servicio. Explicar que la compilación nativa borra código que no se usa.
+* Además ponemos el ejecutable en un container docker. La aplicación no arranca porque estamos en mac.
+
+* Utilizar @RegisterForReflection para solucionar el primer problema
+* Volver a compilar esta vez utilizando el flag
+```shell
+  ./mvnw package -Pnative -Dquarkus.native.container-build=true  
+  ```
+* Poner en un contenedor
 * Comprobar que todo funciona
 
 Hemos aprendido como desplegar en un contenedor con la linea de comandos y solucionado problemas comunes con los que nos encontraremos
