@@ -5,7 +5,6 @@ import com.kineteco.model.ProductInventory;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -36,14 +35,8 @@ public class ProductInventoryResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{sku}")
-    public Response inventory(@PathParam("sku") String sku) {
-        ProductInventory productInventory = inventory.get(sku);
-
-        if (productInventory == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
-        return Response.ok(productInventory).build();
+    @Path("KE180")
+    public Response inventory() {
+        return Response.ok(inventory.get("KE180")).build();
     }
 }
