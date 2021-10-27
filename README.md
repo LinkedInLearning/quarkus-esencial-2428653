@@ -55,6 +55,13 @@ ProductInventoryConfig productInventoryConfig;
   boolean retrieveFullCatalog();
 ```  
 
+* Añadimos una propiedad que no vamos a usar pero sirve para ilustrar la validacion utilizando @Min(5) llamada minUnits, la configuramos a 1
+* Arrancamos y vemos que todo va bien. Añadimos `quarkus-hibernate-validator` para activar la validación.
+```shell
+ ./mvnw quarkus:add-extension -Dextensions="quarkus-hibernate-validator"
+```
+Vemos que la aplicación muestra un error si el valor es inferior a 5
+
 * Una vez vemos que esa propiedad utilizada no funciona, explicamos
 ```java
    @WithDefault("true")
@@ -65,15 +72,11 @@ ProductInventoryConfig productInventoryConfig;
 if (productInventoryConfig.retrieveFullCatalog() || productInventory.getTargetConsumer().contains(ConsumerType.CORPORATE)) {
                   inventory.put(productInventory.getSku(), productInventory);
                }
-```  
+```   
 * Vamos a crear el mock ProductInventoryMockProducer
 * Utilizando el mock
-* Añadimos una propiedad que no vamos a usar pero sirve para ilustrar la validacion utilizando @Min(5) llamada minUnits, la configuramos a 1
-* Arrancamos y vemos que todo va bien. Añadimos `quarkus-hibernate-validator` para activar la validación.
-```shell
- ./mvnw quarkus:add-extension -Dextensions="quarkus-hibernate-validato"
-```
-* Vemos que la aplicación muestra un error si el valor es inferior a 5
+
+
 
 La configuración soporta también listas y Maps para gestionar las necesidades de configuración de las aplicaciones de forma
 eficiente y potente.
