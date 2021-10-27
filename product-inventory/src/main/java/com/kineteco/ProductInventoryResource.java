@@ -9,8 +9,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
 
 @Path("/products")
 public class ProductInventoryResource {
