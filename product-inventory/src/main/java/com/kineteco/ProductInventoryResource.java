@@ -34,14 +34,9 @@ public class ProductInventoryResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{sku}")
-    public Response inventory(@PathParam("sku") String sku) {
-        ProductInventory productInventory = productInventoryService.getBySku(sku);
-
-        if (productInventory == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
+    @Path("/KE180")
+    public Response inventory() {
+        ProductInventory productInventory = productInventoryService.getBySku("KE180");
         return Response.ok(productInventory).build();
     }
 }

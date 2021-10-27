@@ -28,7 +28,10 @@ public class ProductInventoryService {
    ProductInventoryConfig productInventoryConfig;
 
    void onStart(@Observes StartupEvent ev) {
-      System.out.println("===========> onStart");
+      System.out.println("  _   _   _   _   _   _   _   _");
+      System.out.println(" / \\ / \\ / \\ / \\ / \\ / \\ / \\ / \\");
+      System.out.println("( K | i | n | e | t | e | c | o )");
+      System.out.println(" \\_/ \\_/ \\_/ \\_/ \\_/ \\_/ \\_/ \\_/");
       loadData();
    }
 
