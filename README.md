@@ -1,5 +1,5 @@
 # Quarkus esencial
-## 03_05 Test unitarios con diferentes configuraciónes con Mockito y Quarkus
+## 03_05 Test unitarios con diferente aplicativa configuración con Mockito y Quarkus
   
 * Inyectar la clase, cambiar el código y ver como funciona
 ```java
