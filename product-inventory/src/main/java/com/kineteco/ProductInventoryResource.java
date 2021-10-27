@@ -19,7 +19,7 @@ public class ProductInventoryResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String hello() {
-        return "Product Inventory is up!";
+        return "Product Inventory Service is up!";
     }
 
     @GET

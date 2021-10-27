@@ -29,23 +29,5 @@ public class ProductInventoryResourceTest {
               .extract().body().as(ProductInventory.class);
         assertThat(domesticProduct.getSku()).isEqualTo("KE180");
         assertThat(domesticProduct.getTargetConsumer()).containsExactly(ConsumerType.DOMESTIC);
-
-        ProductInventory personalProduct = given().when().get("/products/{sku}", "KE5")
-              .then()
-              .statusCode(200)
-              .extract().body().as(ProductInventory.class);
-        assertThat(personalProduct.getSku()).isEqualTo("KE5");
-        assertThat(personalProduct.getTargetConsumer()).containsExactly(ConsumerType.PERSONAL);
-
-        ProductInventory corporateProduct = given().when().get("/products/{sku}", "KEBL800")
-              .then()
-              .statusCode(200).extract()
-              .body().as(ProductInventory.class);
-        assertThat(corporateProduct.getSku()).isEqualTo("KEBL800");
-        assertThat(corporateProduct.getTargetConsumer()).containsExactly(ConsumerType.CORPORATE);
-
-        given().when().get("/products/{sku}", "foo")
-              .then()
-              .statusCode(404);
     }
 }
