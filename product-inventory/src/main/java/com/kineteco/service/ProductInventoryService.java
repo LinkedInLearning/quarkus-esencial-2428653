@@ -1,5 +1,6 @@
 package com.kineteco.service;
 
+import com.kineteco.config.ProductInventoryConfig;
 import com.kineteco.model.ConsumerType;
 import com.kineteco.model.ProductAvailability;
 import com.kineteco.model.ProductInventory;
@@ -9,6 +10,7 @@ import io.quarkus.runtime.StartupEvent;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
+import javax.inject.Inject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,6 +23,9 @@ import java.util.Map;
 @ApplicationScoped
 public class ProductInventoryService {
    private Map<String, ProductInventory> inventory = new HashMap();
+
+   @Inject
+   ProductInventoryConfig productInventoryConfig;
 
    void onStart(@Observes StartupEvent ev) {
       System.out.println("  _   _   _   _   _   _   _   _");
@@ -59,7 +64,11 @@ public class ProductInventoryService {
                productInventory.setTargetConsumer(targetConsumers);
                productInventory.setProductAvailability(ProductAvailability.valueOf(values[10].replace(" ", "_").toUpperCase()));
                productInventory.setUnitsAvailable(Integer.parseInt(values[11]));
-               inventory.put(productInventory.getSku(), productInventory);
+
+               if (productInventoryConfig.fullCatalog() || productInventory.getTargetConsumer().contains(ConsumerType.CORPORATE)){
+                  inventory.put(productInventory.getSku(), productInventory);
+               }
+
                id++;
             }
          }
