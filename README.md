@@ -22,16 +22,16 @@ Kubernetes en local. ¡No utilizar Minikube en producción!
 ```shell
 minikube service list
 ``` 
-  
+
 * Para poder desplegar en Kubernetes tenemos que escribir la configuración YAML. La extension quarkus-kubernetes
   nos ayuda a ello. (añadir extension)
-  
+
 ```shell
 ./mvnw quarkus:add-extension -Dextensions="quarkus-kubernetes,quarkus-container-image-jib,quarkus-minikube"             
 ```
 
 Para empaquetar las aplicaciones y desplegarlas en kubernetes tenemos diferentes alternativas. Vamos a utilizar la extension de jib
-  https://github.com/GoogleContainerTools/jib que es una herramienta de Google por disponer de todo lo necesario.
+https://github.com/GoogleContainerTools/jib que es una herramienta de Google por disponer de todo lo necesario.
 
 ```shell
 ./mvnw clean package
@@ -52,7 +52,7 @@ quarkus.kubernetes.name=product-inventory-service
 
 * Para ver las images `docker images`
 * Despliegue en Kubernetes:
- 
+
 ```shell
   ./mvnw clean package -Dquarkus.kubernetes.deploy=true -DskipTests=true
 ```
