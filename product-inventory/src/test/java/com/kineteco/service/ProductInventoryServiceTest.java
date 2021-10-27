@@ -15,7 +15,7 @@ public class ProductInventoryServiceTest {
    ProductInventoryService productInventoryService;
 
    @Test
-   public void testGetSku() {
+   public void testGetBySku() {
       ProductInventory productInventory = productInventoryService.getBySku("KE180");
       assertThat(productInventory).isNotNull();
       assertThat(productInventory.getSku()).isEqualTo("KE180");
