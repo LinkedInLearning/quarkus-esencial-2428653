@@ -4,11 +4,32 @@
 Introducción en power point.
 
 * Quarkus está arrancado en modo desarrollo
-* Modificamos la clase ProductInventoryService para añadirle los eventos @Observes StartupEvent ev
-* Añadimos ahi el código de loading de datos
-* Lo mismo void onStop(@Observes ShutdownEvent ev)
-* Eliminamos el banner de Quarkus para añadir el nuestro
-* @Priority(value = 1)
+* Modificamos la clase ProductInventoryService para añadirle los eventos 
+  
+```java
+void onStart(@Observes StartupEvent ev) {
+      System.out.println("==========> onStart");
+      try {
+         loadData();
+      } catch (Exception e) {
+         System.out.println(e);
+      }
+   }
+
+```
+
+```java
+ void onStop(@Observes ShutdownEvent ev) {
+      System.out.println("===========> onStop");
+   }
+
+```
+
+* Eliminamos el banner de Quarkus
+
+```properties
+quarkus.banner.enabled=true
+```
 
 Hemos aprendido más cómo funciona el ciclo de vida de las aplicaciones en Quarkus y cuales son los eventos que se ejecutan
 en ese mismo ciclo. Estos eventos son útiles para tareas de configuración del estato inicial.
