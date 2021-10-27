@@ -4,11 +4,8 @@ import com.kineteco.model.ConsumerType;
 import com.kineteco.model.ProductAvailability;
 import com.kineteco.model.ProductInventory;
 import com.kineteco.model.ProductLine;
-import io.quarkus.runtime.ShutdownEvent;
-import io.quarkus.runtime.StartupEvent;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -22,13 +19,8 @@ import java.util.Map;
 public class ProductInventoryService {
    private Map<String, ProductInventory> inventory = new HashMap();
 
-   void onStart(@Observes StartupEvent ev) {
-      System.out.println("==========> onStart");
-      try {
-         loadData();
-      } catch (Exception e) {
-         System.out.println(e);
-      }
+   public ProductInventory getBySku(String sku) {
+      return inventory.get(sku);
    }
 
    private void loadData() throws Exception {
@@ -69,13 +61,5 @@ public class ProductInventoryService {
       if (values.contains(consumerType.name())) {
          targetConsumers.add(consumerType);
       }
-   }
-
-   void onStop(@Observes ShutdownEvent ev) {
-      System.out.println("===========> onStop");
-   }
-
-   public ProductInventory getBySku(String sku) {
-      return inventory.get(sku);
    }
 }
