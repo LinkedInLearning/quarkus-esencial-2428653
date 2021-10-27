@@ -3,7 +3,7 @@ Instalar Virtual box es lo màs recomendado.
 
 ## Arrancar Minikube
 ```shell
-minikube start --driver=virtualbox --cpus 4 --memory "8192mb" --network-plugin=cni
+minikube start --driver=virtualbox --cpus 4 --memory "8192mb" 
 ```
 ## Limpiar Kubernetes (Minikube)
 ```shell
