@@ -1,5 +1,5 @@
 # Quarkus esencial
-## 03_05 Declarar Perfiles de Quarkus: Dev, Test y Prod
+## 03_06 Declarar Perfiles de Quarkus: Dev, Test y Prod
 
 En cualquier aplicación tenemos la necesidad de distinguir los perfiles de desarrollo, de testing y de producción 
 concretamente en lo que a la configuración se refiere. 
