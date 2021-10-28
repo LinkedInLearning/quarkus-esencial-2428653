@@ -15,7 +15,6 @@ Una de las herramientas es la generacion online de un proyecto de ejemplo.
   - ProductInventoryResource
 * Elegiremos las funcionalidades que queramos tener
   - RESTEasy JAX-RS
-  - RESTEasy Jackson
 
 Nosotros vamos a colocarnos en directorio vacio de quarkus esencial y vamos a crear un proyecto en linea de comandos de maven.  
 * En línea de comandos, con Maven instalado, crearemos el servicio ProductInventoryResource de nuestra compañia.
