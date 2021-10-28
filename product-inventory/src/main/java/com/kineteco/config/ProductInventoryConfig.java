@@ -8,8 +8,6 @@ import javax.validation.constraints.Min;
 
 @ConfigMapping(prefix = "kineteco")
 public interface ProductInventoryConfig {
-   String service();
-
    @WithName("greeting-message")
    String message();
 
