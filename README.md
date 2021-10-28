@@ -9,7 +9,7 @@ Quarkus viene con 3 perfiles definidos "dev, test y prod", pero podemos definir 
   
 * Configuramos
 ```properties
-quarkus.application.name=${com.kineteco.service} 
+quarkus.application.name=Product Inventory 
 %dev.quarkus.application.name=${com.kineteco.service} Dev Mode
 %test.quarkus.application.name=${com.kineteco.service} Test Mode
 %prod.quarkus.application.name=${com.kineteco.service} Production
