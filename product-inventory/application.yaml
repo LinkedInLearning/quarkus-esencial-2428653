@@ -1,2 +1,3 @@
-kineteco:
-  service: Product Inventory in Kubernetes
+com:
+  kineteco:
+    greeting-message: Product Inventory in Kubernetes is up!!!
