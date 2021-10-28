@@ -74,7 +74,7 @@ eval $(minikube -p minikube docker-env)
 
 * Pasos para crear el config map
 ```shell
-kubectl create configmap kineteco --from-file=applicaction.yaml
+kubectl create configmap kineteco --from-file=application.yaml
 kubectl get configmaps
 kubectl get configmaps kineteco -o yaml
 kubectl create secret generic kineteco-credentials --from-literal=username=admin --from-literal=password=password
