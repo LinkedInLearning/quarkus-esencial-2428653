@@ -41,56 +41,10 @@ public class ProductInventoryResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("{sku}")
-    public Response inventory(@PathParam("sku") String sku) {
+    @Path("KE180")
+    public Response inventory(String sku) {
         LOGGER.debugf("get by sku %s", sku);
         ProductInventory productInventory = productInventoryService.getBySku(sku);
-        if (productInventory == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
         return Response.ok(productInventory).build();
-    }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Collection<ProductInventory> listInventory() {
-        LOGGER.debug("Product inventory list");
-        return productInventoryService.listInventory();
-    }
-
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response createProduct(ProductInventory productInventory) {
-        LOGGER.debugf("create %s", productInventory);
-        productInventoryService.addProductInventory(productInventory);
-        return Response.created(URI.create(productInventory.getSku())).build();
-    }
-
-    @PUT
-    @Path("/{sku}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateProduct(@PathParam("sku") String sku, ProductInventory productInventory) {
-        LOGGER.debugf("update %s", productInventory);
-        productInventoryService.updateProductInventory(sku, productInventory);
-        return Response.accepted(productInventory).build();
-    }
-
-    @DELETE
-    @Path("/{sku}")
-    public Response delete(@PathParam("sku") String sku) {
-        LOGGER.debugf("delete by sku %s", sku);
-        productInventoryService.delete(sku);
-        return Response.accepted().build();
-    }
-
-    @PATCH
-    @Path("/{sku}")
-    public Response updateStock(@PathParam("sku") String sku, @QueryParam("stock") Integer stock) {
-        LOGGER.debugf("get by sku %s", sku);
-        ProductInventory productInventory = productInventoryService.stockUpdate(sku, stock);
-        if (productInventory == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        return Response.accepted(productInventory).build();
     }
 }
