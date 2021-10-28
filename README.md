@@ -6,29 +6,83 @@ utilizar los verbos HTTP para crear un API en Quarkus que nos permita gestionar
 el inventario de productos.
 
 * Arrancamos Quarkus en modo desarrollo
-* Abrimos la clase REST, bySku está ya. 
-* Abrimos el test y escribimos un nuevo método que llamara a un servicio que va a crear un nuevo producto 
-con un json que contendrá únicamente el sku. 
-* Implementamos el método en el api rest
-* Vamos a utilizar PUT para modificar el nombre, añadiendoo el test unitario.
-* Implementamos el código
-* Vamos a utilizar DELETE para borrar el producto creado, partiendo del test primero
-* Implementamos DELETE
-* Por ultimo creamos un método que use PATCH por no ser indempotente, para cambiar el stock.
-* Implementamos el método. Para el stock utilizamos parametros de Query porque el numero de stock no forma parte del
-resource.
+  
+* Vamos a iir corrigiendo los TESTS.
+
+* Inventario
+- Añadimos Path Param y gestionamos 404
+```java
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{sku}")
+    public Response inventory(@PathParam("sku") String sku) {
+        LOGGER.debugf("get by sku %s", sku);
+        ProductInventory productInventory = productInventoryService.getBySku(sku);
+
+        if (productInventory == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(productInventory).build();
+    }
+```
+
+* Lista de productos
+```java
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Collection<ProductInventory> listInventory() {
+        LOGGER.debug("Product inventory list");
+        return productInventoryService.listInventory();
+    }
+```  
+* Create Product
+```java
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response createProduct(ProductInventory productInventory) {
+        LOGGER.debugf("create %s", productInventory);
+        productInventoryService.addProductInventory(productInventory);
+        return Response.created(URI.create(productInventory.getSku())).build();
+    }
+```  
+
+* Update
+```java
+@PUT
+    @Path("/{sku}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateProduct(ProductInventory productInventory) {
+        LOGGER.debugf("update %s", productInventory);
+        productInventoryService.updateProductInventory(productInventory);
+        return Response.accepted(URI.create(productInventory.getSku())).build();
+    }
+```  
+
+* Delete
+```java
+  @DELETE
+    @Path("/{sku}")
+    public Response delete(@PathParam("sku") String sku) {
+        LOGGER.debugf("delete by sku %s", sku);
+        productInventoryService.delete(sku);
+        return Response.accepted().build();
+    }
+```  
+
+* Patch para update stock
+```java
+ @PATCH
+    @Path("/{sku}")
+    public Response updateStock(@PathParam("sku") String sku, @QueryParam("stock") Integer stock) {
+        LOGGER.debugf("get by sku %s", sku);
+        ProductInventory productInventory = productInventoryService.stockUpdate(sku, stock);
+        if (productInventory == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(productInventory).build();
+    }
+```  
   
 Hemos aprendido como crear una API REST para implementar un API sencilla de gestion del inventario de Productos
 utilizando los verbos HTTP POST, PUT, DELETE, GET y PATCH.
-  
-
-
-
-# Cleanup kubernetes
-```
-eval $(minikube -p minikube docker-env) 
-kubectl delete service product-inventory-service      
-kubectl delete deployment product-inventory-service
-docker rmi (imageId)
-`./mvnw clean package -Dquarkus.kubernetes.deploy=true -DskipTests=true`
-```
