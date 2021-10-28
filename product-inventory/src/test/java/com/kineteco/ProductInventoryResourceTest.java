@@ -6,6 +6,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 
+import javax.ws.rs.core.Response;
 import java.util.Collection;
 
 import static io.restassured.RestAssured.given;
@@ -52,11 +53,11 @@ public class ProductInventoryResourceTest {
               .when()
               .post("/products")
               .then()
-              .statusCode(201);
+              .statusCode(Response.Status.CREATED.getStatusCode());
 
         ProductInventory createdProduct = given().when().get("/products/{sku}", "123")
               .then()
-              .statusCode(200).extract()
+              .statusCode(Response.Status.OK.getStatusCode()).extract()
               .body().as(ProductInventory.class);
         assertThat(createdProduct.getSku()).isEqualTo("123");
         assertThat(createdProduct.getName()).isNull();
@@ -67,11 +68,11 @@ public class ProductInventoryResourceTest {
               .when()
               .put("/products/{sku}", "123")
               .then()
-              .statusCode(202);
+              .statusCode(Response.Status.ACCEPTED.getStatusCode());
 
         ProductInventory updatedProduct = given().when().get("/products/{sku}", "123")
               .then()
-              .statusCode(200).extract()
+              .statusCode(Response.Status.OK.getStatusCode()).extract()
               .body().as(ProductInventory.class);
 
         assertThat(updatedProduct.getSku()).isEqualTo("123");
@@ -79,18 +80,18 @@ public class ProductInventoryResourceTest {
 
         given().when().delete("/products/{sku}", "123")
               .then()
-              .statusCode(202);
+              .statusCode(Response.Status.ACCEPTED.getStatusCode());
 
         given().when().get("/products/{sku}", "123")
               .then()
-              .statusCode(404);
+              .statusCode(Response.Status.NOT_FOUND.getStatusCode());
     }
 
     @Test
     public void testUpgradeStock() {
         ProductInventory productInventoryPre = given().when().get("/products/{sku}", "KE200")
               .then()
-              .statusCode(200)
+              .statusCode(Response.Status.OK.getStatusCode())
               .extract().body().as(ProductInventory.class);
 
         assertThat(productInventoryPre).isNotNull();
@@ -99,11 +100,11 @@ public class ProductInventoryResourceTest {
               .when().queryParam("stock", 3)
               .patch("/products/{sku}", "KE200")
               .then()
-              .statusCode(202);
+              .statusCode(Response.Status.ACCEPTED.getStatusCode());
 
         ProductInventory productInventoryAfter = given().when().get("/products/{sku}", "KE200")
               .then()
-              .statusCode(200)
+              .statusCode(Response.Status.OK.getStatusCode())
               .extract().body().as(ProductInventory.class);
 
         assertThat(productInventoryAfter.getUnitsAvailable()).isEqualTo(productInventoryPre.getUnitsAvailable() + 3);
