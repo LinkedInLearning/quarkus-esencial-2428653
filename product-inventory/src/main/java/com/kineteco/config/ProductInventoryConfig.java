@@ -6,8 +6,6 @@ import io.smallrye.config.WithName;
 
 @ConfigMapping(prefix = "com.kineteco")
 public interface ProductInventoryConfig {
-   String service();
-
    @WithName("greeting-message")
    String message();
 
