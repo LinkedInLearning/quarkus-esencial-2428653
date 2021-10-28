@@ -40,7 +40,7 @@ public class ProductInventoryResourceTest {
 
     @Test
     public void testListProducts() {
-        Collection products = given().when().get("/products").then().statusCode(200).extract().body().as(Collection.class);
+        Collection<ProductInventory> products = given().when().get("/products").then().statusCode(200).extract().body().as(Collection.class);
         assertThat(products).size().isGreaterThanOrEqualTo(52);
     }
 
