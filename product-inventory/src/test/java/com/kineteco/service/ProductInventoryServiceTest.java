@@ -28,12 +28,6 @@ public class ProductInventoryServiceTest {
 
       assertThat(service.getBySku("KE180")).isNotNull();
       assertThat(service.getBySku("KE180").getTargetConsumer()).containsExactly(ConsumerType.DOMESTIC);
-
-      assertThat(service.getBySku("KE5")).isNotNull();
-      assertThat(service.getBySku("KE5").getTargetConsumer()).containsExactly(ConsumerType.PERSONAL);
-
-      assertThat(service.getBySku("KEBL800")).isNotNull();
-      assertThat(service.getBySku("KEBL800").getTargetConsumer()).containsExactly(ConsumerType.CORPORATE);
    }
 
    @Test
@@ -43,7 +37,5 @@ public class ProductInventoryServiceTest {
       service.loadData();
 
       assertThat(service.getBySku("KE180")).isNull();
-      assertThat(service.getBySku("KE5")).isNull();
-      assertThat(service.getBySku("KEBL800")).isNotNull();
    }
 }

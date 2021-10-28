@@ -8,12 +8,11 @@ import javax.validation.constraints.Min;
 
 @ConfigMapping(prefix = "com.kineteco")
 public interface ProductInventoryConfig {
-   String greetingMessage();
+   @WithName("greeting-message")
+   String message();
 
    @WithName("full-catalog")
    @WithDefault("true")
    boolean retrieveFullCatalog();
 
-   @Min(5)
-   int minUnits();
 }

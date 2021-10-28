@@ -1,15 +1,11 @@
 package com.kineteco;
 
 import com.kineteco.config.ProductInventoryConfig;
-import com.kineteco.model.ProductInventory;
 import com.kineteco.service.ProductInventoryService;
-import org.eclipse.microprofile.config.Config;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -20,28 +16,19 @@ public class ProductInventoryResource {
     @Inject
     ProductInventoryService productInventoryService;
 
-//    @ConfigProperty(name = "com.kineteco.greeting-message")
-//    String message;
-
     @Inject
     ProductInventoryConfig productInventoryConfig;
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String hello() {
-        return productInventoryConfig.greetingMessage();
+        return productInventoryConfig.message();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{sku}")
-    public Response inventory(@PathParam("sku") String sku) {
-        ProductInventory productInventory = productInventoryService.getBySku(sku);
-
-        if (productInventory == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
-        return Response.ok(productInventory).build();
+    @Path("/KE180")
+    public Response inventory() {
+        return Response.ok(productInventoryService.getBySku("KE180")).build();
     }
 }
