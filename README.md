@@ -1,7 +1,7 @@
 # Quarkus esencial
 ## 03_05 Declarar Perfiles de Quarkus: Dev, Test y Prod
 
-En cualquier aplicación tenemos la necesidad de distinguir los perfiles de desarrollo, de testing y de producción 
+En cualquier aplicación qtenemos la necesidad de distinguir los perfiles de desarrollo, de testing y de producción 
 concretamente en lo que a la configuración se refiere. 
 Quarkus viene con 3 perfiles definidos "dev, test y prod", pero podemos definir también nuestros propios perfiles.
 
