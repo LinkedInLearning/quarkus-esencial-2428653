@@ -7,6 +7,7 @@ import com.kineteco.model.ProductInventory;
 import com.kineteco.model.ProductLine;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
+import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -22,16 +23,19 @@ import java.util.Map;
 
 @ApplicationScoped
 public class ProductInventoryService {
+
+   private static final Logger LOGGER = Logger.getLogger(ProductInventoryService.class);
+
    private Map<String, ProductInventory> inventory = new HashMap();
 
    @Inject
    ProductInventoryConfig productInventoryConfig;
 
    void onStart(@Observes StartupEvent ev) {
-      System.out.println("  _   _   _   _   _   _   _   _");
-      System.out.println(" / \\ / \\ / \\ / \\ / \\ / \\ / \\ / \\");
-      System.out.println("( K | i | n | e | t | e | c | o )");
-      System.out.println(" \\_/ \\_/ \\_/ \\_/ \\_/ \\_/ \\_/ \\_/");
+      LOGGER.info("  _   _   _   _   _   _   _   _");
+      LOGGER.info(" / \\ / \\ / \\ / \\ / \\ / \\ / \\ / \\");
+      LOGGER.info("( K | i | n | e | t | e | c | o )");
+      LOGGER.info(" \\_/ \\_/ \\_/ \\_/ \\_/ \\_/ \\_/ \\_/");
       loadData();
    }
 

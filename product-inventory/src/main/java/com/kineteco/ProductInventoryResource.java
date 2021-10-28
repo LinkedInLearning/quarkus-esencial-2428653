@@ -3,6 +3,7 @@ package com.kineteco;
 import com.kineteco.config.ProductInventoryConfig;
 import com.kineteco.model.ProductInventory;
 import com.kineteco.service.ProductInventoryService;
+import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -13,6 +14,8 @@ import javax.ws.rs.core.Response;
 
 @Path("/products")
 public class ProductInventoryResource {
+
+    private static final Logger LOGGER = Logger.getLogger(ProductInventoryResource.class);
 
     @Inject
     ProductInventoryService productInventoryService;
@@ -30,6 +33,7 @@ public class ProductInventoryResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/KE180")
     public Response inventory() {
+        LOGGER.debug("inventory KE180");
         ProductInventory productInventory = productInventoryService.getBySku("KE180");
         return Response.ok(productInventory).build();
     }
