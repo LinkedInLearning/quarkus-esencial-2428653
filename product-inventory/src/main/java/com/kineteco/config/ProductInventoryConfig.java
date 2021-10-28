@@ -10,12 +10,11 @@ import javax.validation.constraints.Min;
 public interface ProductInventoryConfig {
    String service();
 
-   String greetingMessage();
+   @WithName("greeting-message")
+   String message();
 
-   @WithName("full-catalog")
    @WithDefault("true")
+   @WithName("full-catalog")
    boolean retrieveFullCatalog();
 
-   @Min(5)
-   int minUnits();
 }
