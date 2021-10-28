@@ -23,7 +23,7 @@ public class ProductInventoryResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String hello() {
-        return productInventoryConfig.service() + " " + productInventoryConfig.message();
+        return productInventoryConfig.message();
     }
 
     @GET
