@@ -30,12 +30,7 @@ public class ProductInventoryResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/KE180")
     public Response inventory() {
-        ProductInventory productInventory = productInventoryService.getBySku("KE");
-
-        if (productInventory == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
+        ProductInventory productInventory = productInventoryService.getBySku("KE180");
         return Response.ok(productInventory).build();
     }
 }
