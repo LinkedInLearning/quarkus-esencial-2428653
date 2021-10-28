@@ -33,6 +33,10 @@ public class ProductInventoryService {
 
    void onStart(@Observes StartupEvent ev) {
       LOGGER.info("Product Inventory Service is starting Powered by Quarkus");
+      LOGGER.info("  _   _   _   _   _   _   _   _");
+      LOGGER.info(" / \\ / \\ / \\ / \\ / \\ / \\ / \\ / \\");
+      LOGGER.info("( K | i | n | e | t | e | c | o )");
+      LOGGER.info(" \\_/ \\_/ \\_/ \\_/ \\_/ \\_/ \\_/ \\_/");
       loadData();
    }
 

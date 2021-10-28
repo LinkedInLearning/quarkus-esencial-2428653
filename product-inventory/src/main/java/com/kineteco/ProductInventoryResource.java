@@ -8,7 +8,6 @@ import org.jboss.logging.Logger;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -33,15 +32,10 @@ public class ProductInventoryResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{sku}")
-    public Response inventory(@PathParam("sku") String sku) {
+    @Path("KE180")
+    public Response inventory(String sku) {
         LOGGER.debugf("get by sku %s", sku);
         ProductInventory productInventory = productInventoryService.getBySku(sku);
-
-        if (productInventory == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
         return Response.ok(productInventory).build();
     }
 }

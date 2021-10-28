@@ -33,22 +33,79 @@ public class ProductInventoryResourceTest {
         assertThat(domesticProduct.getSku()).isEqualTo("KE180");
         assertThat(domesticProduct.getTargetConsumer()).containsExactly(ConsumerType.DOMESTIC);
 
-        ProductInventory personalProduct = given().when().get("/products/{sku}", "KE5")
-              .then()
-              .statusCode(200)
-              .extract().body().as(ProductInventory.class);
-        assertThat(personalProduct.getSku()).isEqualTo("KE5");
-        assertThat(personalProduct.getTargetConsumer()).containsExactly(ConsumerType.PERSONAL);
-
-        ProductInventory corporateProduct = given().when().get("/products/{sku}", "KEBL800")
-              .then()
-              .statusCode(200).extract()
-              .body().as(ProductInventory.class);
-        assertThat(corporateProduct.getSku()).isEqualTo("KEBL800");
-        assertThat(corporateProduct.getTargetConsumer()).containsExactly(ConsumerType.CORPORATE);
-
         given().when().get("/products/{sku}", "foo")
               .then()
               .statusCode(404);
+    }
+
+    @Test
+    public void testListProducts() {
+        Collection products = given().when().get("/products").then().statusCode(200).extract().body().as(Collection.class);
+        assertThat(products).size().isGreaterThanOrEqualTo(52);
+    }
+
+    @Test
+    public void testCRUD() {
+        given()
+              .body("{\"sku\": \"123\"}")
+              .contentType(ContentType.JSON)
+              .when()
+              .post("/products")
+              .then()
+              .statusCode(201);
+
+        ProductInventory createdProduct = given().when().get("/products/{sku}", "123")
+              .then()
+              .statusCode(200).extract()
+              .body().as(ProductInventory.class);
+        assertThat(createdProduct.getSku()).isEqualTo("123");
+        assertThat(createdProduct.getName()).isNull();
+
+        given()
+              .body("{\"sku\": \"123\", \"name\": \"Super Product\" }")
+              .contentType(ContentType.JSON)
+              .when()
+              .put("/products/{sku}", "123")
+              .then()
+              .statusCode(202);
+
+        ProductInventory updatedProduct = given().when().get("/products/{sku}", "123")
+              .then()
+              .statusCode(200).extract()
+              .body().as(ProductInventory.class);
+
+        assertThat(updatedProduct.getSku()).isEqualTo("123");
+        assertThat(updatedProduct.getName()).isEqualTo("Super Product");
+
+        given().when().delete("/products/{sku}", "123")
+              .then()
+              .statusCode(202);
+
+        given().when().get("/products/{sku}", "123")
+              .then()
+              .statusCode(404);
+    }
+
+    @Test
+    public void testUpgradeStock() {
+        ProductInventory productInventoryPre = given().when().get("/products/{sku}", "KE200")
+              .then()
+              .statusCode(200)
+              .extract().body().as(ProductInventory.class);
+
+        assertThat(productInventoryPre).isNotNull();
+
+        given()
+              .when().queryParam("stock", 3)
+              .patch("/products/{sku}", "KE200")
+              .then()
+              .statusCode(202);
+
+        ProductInventory productInventoryAfter = given().when().get("/products/{sku}", "KE200")
+              .then()
+              .statusCode(200)
+              .extract().body().as(ProductInventory.class);
+
+        assertThat(productInventoryAfter.getUnitsAvailable()).isEqualTo(productInventoryPre.getUnitsAvailable() + 3);
     }
 }
