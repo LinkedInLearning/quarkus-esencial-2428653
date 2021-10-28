@@ -3,7 +3,6 @@ package com.kineteco;
 import com.kineteco.config.ProductInventoryConfig;
 import com.kineteco.model.ProductInventory;
 import com.kineteco.service.ProductInventoryService;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -24,7 +23,7 @@ public class ProductInventoryResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String hello() {
-        return productInventoryConfig.greetingMessage();
+        return productInventoryConfig.message();
     }
 
     @GET
