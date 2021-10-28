@@ -29,14 +29,14 @@ public class ProductInventoryResourceTest {
     public void inventoryEndpoint() {
         ProductInventory domesticProduct = given().when().get("/products/{sku}", "KE180")
               .then()
-              .statusCode(200)
+              .statusCode(Response.Status.OK.getStatusCode())
               .extract().body().as(ProductInventory.class);
         assertThat(domesticProduct.getSku()).isEqualTo("KE180");
         assertThat(domesticProduct.getTargetConsumer()).containsExactly(ConsumerType.DOMESTIC);
 
         given().when().get("/products/{sku}", "foo")
               .then()
-              .statusCode(404);
+              .statusCode(Response.Status.NOT_FOUND.getStatusCode());
     }
 
     @Test

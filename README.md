@@ -49,14 +49,14 @@ el inventario de productos.
 
 * Update
 ```java
-@PUT
+   @PUT
     @Path("/{sku}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateProduct(ProductInventory productInventory) {
-        LOGGER.debugf("update %s", productInventory);
-        productInventoryService.updateProductInventory(productInventory);
-        return Response.accepted(URI.create(productInventory.getSku())).build();
-    }
+    public Response updateProduct(@PathParam("sku") String sku, ProductInventory productInventory) {
+      LOGGER.debugf("update %s", productInventory);
+      productInventoryService.updateProductInventory(sku, productInventory);
+      return Response.accepted(URI.create(productInventory.getSku())).build();
+      }
 ```  
 
 * Delete
@@ -72,16 +72,16 @@ el inventario de productos.
 
 * Patch para update stock
 ```java
- @PATCH
-    @Path("/{sku}")
-    public Response updateStock(@PathParam("sku") String sku, @QueryParam("stock") Integer stock) {
-        LOGGER.debugf("get by sku %s", sku);
-        ProductInventory productInventory = productInventoryService.stockUpdate(sku, stock);
-        if (productInventory == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        return Response.ok(productInventory).build();
-    }
+  @PATCH
+   @Path("/{sku}")
+   public Response updateStock(@PathParam("sku") String sku, @QueryParam("stock") Integer stock) {
+      LOGGER.debugf("get by sku %s", sku);
+      ProductInventory productInventory = productInventoryService.stockUpdate(sku, stock);
+      if (productInventory == null) {
+      return Response.status(Response.Status.NOT_FOUND).build();
+      }
+      return Response.accepted(productInventory).build();
+      }
 ```  
   
 Hemos aprendido como crear una API REST para implementar un API sencilla de gestion del inventario de Productos
