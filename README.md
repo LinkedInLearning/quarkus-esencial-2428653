@@ -83,7 +83,7 @@ public Response updateProduct(@PathParam("sku") String sku, @Valid @ConvertGroup
 
 ```shell
 http post localhost:8080/products name=my-product
-http put localhost:8080/products/KE180 name=my-product
+http put localhost:8080/products/KE180 sku=123 name=my-product
 ```
 
 Hibernate validator puede también utilizarse para la validacion de la configuración.
