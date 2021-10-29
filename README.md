@@ -43,7 +43,7 @@ http put localhost:8080/products sku=123 name=my-product unitsAvailable=-10
 Probamos
 ```shell
 http post localhost:8080/products name=my-product
-http put localhost:8080/products/KE180 name=my-product
+http put localhost:8080/products/KE180 name=KE180-Reborn
 ```
   
 * Crear validation groups y probar de nuevo
