@@ -73,6 +73,19 @@ public interface ValidationGroups {
     private String sku;
 ```
 
+Y en el Resource
+```java
+@POST
+@Consumes(MediaType.APPLICATION_JSON)
+public Response createProduct(@Valid @ConvertGroup(to = ValidationGroups.Post.class) ProductInventory productInventory) {
+
+@PUT
+@Path("/{sku}")
+@Consumes(MediaType.APPLICATION_JSON)
+public Response updateProduct(@PathParam("sku") String sku, @Valid @ConvertGroup(to = ValidationGroups.Put.class) ProductInventory productInventory) {
+
+```
+
 ```shell
 http post localhost:8080/products name=my-product
 http put localhost:8080/products/KE180 name=my-product
