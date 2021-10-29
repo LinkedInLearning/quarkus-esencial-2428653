@@ -33,7 +33,7 @@ http post localhost:8080/products sku=123 name=my-product
 private int quantity;
 ```
 ```shell
-http put localhost:8080/products sku=123 name=my-product unitsAvailable=-10
+http put localhost:8080/products/123 name=my-product unitsAvailable=-10
 ```
 * Problemática PUT y POST con el ID. Añadimos @NotBlank
 ```java
