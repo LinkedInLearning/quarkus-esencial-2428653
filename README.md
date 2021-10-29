@@ -7,7 +7,7 @@ el inventario de productos.
 
 * Arrancamos Quarkus en modo desarrollo
   
-* Vamos a iir corrigiendo los TESTS.
+* Vamos a ir corrigiendo los TESTS.
 
 * Inventario
 - Añadimos Path Param y gestionamos 404
