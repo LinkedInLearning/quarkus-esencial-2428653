@@ -104,6 +104,7 @@ public class ProductInventoryService {
    }
 
    public void updateProductInventory(String sku, ProductInventory productInventory) {
+      productInventory.setSku(sku);
       inventory.put(sku, productInventory);
    }
 

@@ -55,7 +55,7 @@ el inventario de productos.
     public Response updateProduct(@PathParam("sku") String sku, ProductInventory productInventory) {
       LOGGER.debugf("update %s", productInventory);
       productInventoryService.updateProductInventory(sku, productInventory);
-      return Response.accepted(productInventory.getSku()).build();
+      return Response.accepted(productInventory).build();
       }
 ```  
 
