@@ -5,7 +5,10 @@ La forma en gestionar las respuestas y la forma de presentar los errores a los c
 importante para la calidad de un API Rest.
 Vamos a aprender como poder personalizar el mensaje de salida de la validación de un API.
 
-* Utilizamos el API de crear productos con http post 'http://localhost:8080/products/' 'nada=nada'
+* Utilizamos el API de crear productos con 
+```shell
+http post http://localhost:8080/products/ nada=nada
+```
 
 Monstramos el error, con demasiados campos.
 
