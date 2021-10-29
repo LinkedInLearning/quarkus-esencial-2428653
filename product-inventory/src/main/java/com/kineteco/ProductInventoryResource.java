@@ -71,9 +71,9 @@ public class ProductInventoryResource {
     @PUT
     @Path("/{sku}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateProduct(ProductInventory productInventory) {
+    public Response updateProduct(@PathParam("sku") String sku, ProductInventory productInventory) {
         LOGGER.debugf("update %s", productInventory);
-        productInventoryService.updateProductInventory(productInventory);
+        productInventoryService.updateProductInventory(sku, productInventory);
         return Response.accepted(URI.create(productInventory.getSku())).build();
     }
 
