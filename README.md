@@ -40,26 +40,24 @@ validation-exception: true
 
 ```
 
-* Vamos a implementar un mapeo de excepciones para personalizar este error
-
-```java
- ./mvnw quarkus:remove-extension -Dextensions="quarkus-resteasy-jackson"
- ./mvnw quarkus:remove-extension -Dextensions="quarkus-resteasy-jsonb"
-```
+* Vamos a usar jsonb ahora 
   
 * Creamos la clase KinetecoExceptionMapper en el paquete validation
   
 ```java
 @Provider
 public class KinetecoExceptionMapper implements ExceptionMapper<ConstraintViolationException> {
+   
+   1)
    @Override
    public Response toResponse(ConstraintViolationException e) {
       return Response
             .status(Response.Status.BAD_REQUEST)
             .type(MediaType.APPLICATION_JSON_TYPE)
-            .entity(errorMessage(e)).build();
+            .entity(e.getConstraintViolations().toString()).build();
    }
 
+   2)
    private JsonObject errorMessage(ConstraintViolationException e) {
       JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
 
@@ -67,6 +65,15 @@ public class KinetecoExceptionMapper implements ExceptionMapper<ConstraintViolat
          objectBuilder.add(v.getPropertyPath().toString(), v.getMessage());
       }
       return objectBuilder.build();
+   }
+   
+   3)
+   @Override
+   public Response toResponse(ConstraintViolationException e) {
+      return Response
+            .status(Response.Status.BAD_REQUEST)
+            .type(MediaType.APPLICATION_JSON_TYPE)
+            .entity(errorMessage(e)).build();
    }
 }
 ```
