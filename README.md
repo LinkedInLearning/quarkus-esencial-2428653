@@ -30,7 +30,7 @@ http post localhost:8080/products sku=123 name=my-product
 * Vamos a añadir una validación al stock
 ```java
 @PositiveOrZero
-private int quantity;
+private int unitsAvailable;
 ```
 ```shell
 http put localhost:8080/products/123 name=my-product unitsAvailable=-10
