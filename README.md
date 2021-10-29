@@ -1,88 +1,81 @@
 # Quarkus esencial
-## 04_01 Crear un API CRUD con Quarkus y la extension RESTEasy de Quarkus
+## 04_02 Añadir validación de datos en tu API REST con Quarkus
 
-La creación de APIs en REST es hoy en día fundamental en la escritura de Microservicios. Nos vamos a focalizar en 
-utilizar los verbos HTTP para crear un API en Quarkus que nos permita gestionar
-el inventario de productos.
+Una buena API viene con un buen control de los datos. Quarkus junto con Hibernate Validator que utilizamos también en la
+validación de la configuración nos permite que nuestra API sea robusta.
 
-* Arrancamos Quarkus en modo desarrollo
+* Arrancamos quarkus en modo desarrollo
   
-* Vamos a ir corrigiendo los TESTS.
-
-* Inventario
-- Añadimos Path Param y gestionamos 404
-```java
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{sku}")
-    public Response inventory(@PathParam("sku") String sku) {
-        LOGGER.debugf("get by sku %s", sku);
-        ProductInventory productInventory = productInventoryService.getBySku(sku);
-
-        if (productInventory == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
-        return Response.ok(productInventory).build();
-    }
-```
-
-* Lista de productos
-```java
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Collection<ProductInventory> listInventory() {
-        LOGGER.debug("Product inventory list");
-        return productInventoryService.listInventory();
-    }
+* Añadiremos la extensión quarkus-hibernate-validator que nos permite añadir campos que queramos validar.
+```shell
+./mvnw quarkus:add-extension -Dextensions="quarkus-hibernate-validator"   
 ```  
-* Create Product
+* Abrimos la clase ProductInventory y vamos a ir añadiendo una primera anotación para el nombre not blank
+```java
+@NotBlank(message = "Name is mandatory and should be provided") 
+String name;
+```
+* Anotamos el parametro en el servicio rest con @Valid
 ```java
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createProduct(ProductInventory productInventory) {
-        LOGGER.debugf("create %s", productInventory);
-        productInventoryService.addProductInventory(productInventory);
-        return Response.created(URI.create(productInventory.getSku())).build();
-    }
+    public Response createProduct(@Valid ProductInventory productInventory) {
 ```  
-
-* Update
+* Probamos el cambio en linea de comandos
+```shell
+http post localhost:8080/products sku=123 
+http localhost:8080/products/123 
+```
+* Vamos a añadir una validación al stock
 ```java
-   @PUT
-    @Path("/{sku}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateProduct(@PathParam("sku") String sku, ProductInventory productInventory) {
-      LOGGER.debugf("update %s", productInventory);
-      productInventoryService.updateProductInventory(sku, productInventory);
-      return Response.accepted(productInventory.getSku()).build();
-      }
-```  
+@PositiveOrZero
+private int quantity;
+```
+```shell
+http post localhost:8080/products sku=456 name=myproduct quantity=-10 
+```
+* Usar `http post 'http://localhost:8080/products/' 'sku=1234'`
 
-* Delete
-```java
-  @DELETE
-    @Path("/{sku}")
-    public Response delete(@PathParam("sku") String sku) {
-        LOGGER.debugf("delete by sku %s", sku);
-        productInventoryService.delete(sku);
-        return Response.accepted().build();
-    }
+* @Valid en PUT
+```shell
+http put localhost:8080/products/456 name=myproduct quantity=-10 
 ```  
-
-* Patch para update stock
+* Problemática PUT y POST con el ID. Añadimos @NotNull
 ```java
-  @PATCH
-   @Path("/{sku}")
-   public Response updateStock(@PathParam("sku") String sku, @QueryParam("stock") Integer stock) {
-      LOGGER.debugf("get by sku %s", sku);
-      ProductInventory productInventory = productInventoryService.stockUpdate(sku, stock);
-      if (productInventory == null) {
-      return Response.status(Response.Status.NOT_FOUND).build();
-      }
-      return Response.accepted(productInventory).build();
-      }
-```  
+ @NotNull
+   private String sku;
+```
+Probamos
+```shell
+http post localhost:8080/products name=my-product
+http put localhost:8080/products/KE180 name=my-product
+```
   
-Hemos aprendido como crear una API REST para implementar un API sencilla de gestion del inventario de Productos
-utilizando los verbos HTTP POST, PUT, DELETE, GET y PATCH.
+* Crear validation groups y probar de nuevo
+
+```java
+package com.kineteco.model;
+
+import javax.validation.groups.Default;
+
+public interface ValidationGroups {
+   interface Put extends Default {
+   }
+   interface Post extends Default {
+   }
+}
+```
+
+* Usar validation groups
+```java
+   @Null(groups = ValidationGroups.Put.class)
+   @NotBlank(groups = ValidationGroups.Post.class)
+    private String sku;
+```
+
+```shell
+http post localhost:8080/products name=my-product
+http put localhost:8080/products/KE180 name=my-product
+```
+
+Hibernate validator puede también utilizarse para la validacion de la configuración.
