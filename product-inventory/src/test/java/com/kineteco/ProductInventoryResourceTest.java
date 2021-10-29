@@ -67,7 +67,7 @@ public class ProductInventoryResourceTest {
         assertThat(createdProduct.getName()).isNull();
 
         given()
-              .body("{\"name\": \"Super Product\" }")
+              .body("{\"sku\": \"123\", \"name\": \"Super Product\" }")
               .contentType(ContentType.JSON)
               .when()
               .put("/products/{sku}", "123")
