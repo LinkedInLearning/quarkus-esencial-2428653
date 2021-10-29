@@ -25,6 +25,7 @@ String name;
 ```shell
 http post localhost:8080/products sku=123 
 http localhost:8080/products/123 
+http post localhost:8080/products sku=123 name=my-product
 ```
 * Vamos a añadir una validación al stock
 ```java
@@ -32,17 +33,11 @@ http localhost:8080/products/123
 private int quantity;
 ```
 ```shell
-http post localhost:8080/products sku=456 name=myproduct quantity=-10 
+http put localhost:8080/products sku=123 name=my-product unitsAvailable=-10
 ```
-* Usar `http post 'http://localhost:8080/products/' 'sku=1234'`
-
-* @Valid en PUT
-```shell
-http put localhost:8080/products/456 name=myproduct quantity=-10 
-```  
-* Problemática PUT y POST con el ID. Añadimos @NotNull
+* Problemática PUT y POST con el ID. Añadimos @NotBlank
 ```java
- @NotNull
+   @NotNull
    private String sku;
 ```
 Probamos
