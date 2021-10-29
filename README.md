@@ -1,42 +1,52 @@
 # Quarkus esencial
-## 04_04 Documentar el API REST con OpenAPI y Swagger
+## 05_02 Acceso a base de datos utilizando el patrón Active Record con Quarkus
 
-Intro en power point!!!
+En todas las aplicaciones vamos a necesitar antes o después una capa de persistencia de datos, sea en memoria o en disco,
+para poder guardar los datos de forma permanente.
+En el ecosistema java Hibernate es desde hace años el framework más popular para ayudarnos a escribir nuestra lógica de negocio.
+Hibernate Panache nos ayuda en concreto a realizar esto con Quarkus.
 
-* Añadimos la extension openapi
-```shell
-./mvnw quarkus:add-extension -Dextensions="quarkus-smallrye-openapi"  
+Aprenderemos como utilizarlo con el patron Active Record.
+
+* Añadimos las extensiones Panache, Postgres y H2 para los test.
+
+```shell 
+./mvnw quarkus:add-extension -Dextensions="quarkus-jdbc-postgresql,quarkus-hibernate-orm-panache,quarkus-jdbc-h2"`
 ```
 
-* Lanzamos quarkus and vamos a la dev console. Explore Open API and Swagger
-```shell
-h
-d
-```
-
-
-* Añadimos cambios documentales con anotaciones en el código de forma que el código vive al mismo que tiempo que
-  la documentación
-
-* Añadimos documentación de ejemplo en patch
+* Vamos a asegurarnos que la dependencia h2 está solamente en el entorno de tests en el pom.xml
+* Vamos a tener Docker además para ver el modo desarrollo
+* Lanzamos quarkus en modo desarrollo
+* Configuramos `quarkus.hibernate-orm.database.generation = drop-and-create`
+* Anotamos con `@Entity` ProductInventory
+* Extendemos PanacheEntity
+* Nos damos cuenta de que nuestro ID es el sku, por lo que lo anotamos con @Id
+* Leemos el error y nos damos cuenta que hay que extender de PanacheBaseEntity
+* Vamos a indicar que las enumeraciones son String con `@Enumerated(EnumType.STRING)`
+* Vamos a indicar que la Lista de Enum sea mapeada de forma custom. Existen diferentes formas de mapping entre una lista
+  de enumeraciones y la base de datos. Para simplificar el desarrollo, guardamos los datos en una lista de String y lo convertimos
+  a la lista de enumeraciones con la clase ConsumerTypeListConverter que se proporciona.
+  `@Convert(converter = ConsumerTypeListConverter.class)`
+* Cambiamos el api rest para implementar y arreglar el test que falla.
+* Añadir `@Transactional` a los métodos que necesitan una tx de base de datos
+* Cambiamos el código para obtener el full catalog utilizando streamAll
+  http http://localhost:8080/products/KE180
+* Añadimos un nuevo método para contar la catidad de productos economy y deluxe
 ```java
-@Operation(summary = "Update the stock of a product by sku.", description = "Longer description that explains all.")
-```  
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/line/{productLine}")
+    public Response economyProductsCount(@PathParam("productLine") ProductLine productLine) {
+        LOGGER.debug("Economy products");
+        return Response.ok(ProductInventory.count("productLine", productLine)).build();
+    }
 
-* Para cambiar la cabecera tebemos que crear una applicacion
-
-```java
- @OpenAPIDefinition(tags = {
-        @Tag(name = "inventory", description = "Operations handling products inventory.")
-}, info =
-@Info(title = "Product Inventory Service", version = "1.0", description = "Operations handling Products Inventory.")
-)
-public class ProductInventoryServiceApp extends Application {
-}
 ```
 
-Open API nos va a permitir también generar código de cliente front en type script por ejemplo.
+Si quisieramos cortar el acceso a la base de datos para probar los recursos y el api por un lado sin base de datos,
+nos podemos encontrar con el problema de mock con mockito. Pero afortunadamente utilizando la extension quarkus-panache-mock
+podemos desacoplar los tests.
 
-En este video hemos aprendido como documentar con OpenAPI y poder exponer nuestra API para ser usada con Swagger
-y mantener la documentación y el código de un API REST en el mismo lugar.
-Además podremos utilizar el enfoque "Design First" para pensar nuestra API pública.
+Hemos aprendido como arrancar en modo desarrollo y modo test dos bases de datos sin añadir ninguna configuración, y
+como gracias a un script la base de datos se crea y podemos empezar a focalizarnos en nuestra logica de negocio.
+Comprobamos ademas como el patron ActiveRecord con Hibernate Panache simplica la ló
