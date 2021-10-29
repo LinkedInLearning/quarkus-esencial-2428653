@@ -1,89 +1,92 @@
 # Quarkus esencial
-## 04_02 Añadir validación de datos en tu API REST con Quarkus
+## 04_03 Gestión de errores personalizados en Quarkus con ExceptionMapper
 
-Una buena API viene con un buen control de los datos. Quarkus junto con Hibernate Validator que utilizamos también en la
-validación de la configuración nos permite que nuestra API sea robusta.
+La forma en gestionar las respuestas y la forma de presentar los errores a los consumidores de un API Rest es
+importante para la calidad de un API Rest.
+Vamos a aprender como poder personalizar el mensaje de salida de la validación de un API.
 
-* Arrancamos quarkus en modo desarrollo
-  
-* Añadiremos la extensión quarkus-hibernate-validator que nos permite añadir campos que queramos validar.
-```shell
-./mvnw quarkus:add-extension -Dextensions="quarkus-hibernate-validator"   
-```  
-* Abrimos la clase ProductInventory y vamos a ir añadiendo una primera anotación para el nombre not blank
+* Utilizamos el API de crear productos con http post 'http://localhost:8080/products/' 'nada=nada'
+
+Monstramos el error, con demasiados campos.
+
+```json
+HTTP/1.1 400 Bad Request
+Content-Length: 353
+Content-Type: application/json
+validation-exception: true
+
+{
+    "classViolations": [],
+    "parameterViolations": [
+        {
+            "constraintType": "PARAMETER",
+            "message": "Name is mandatory and should be provided",
+            "path": "createProduct.productInventory.name",
+            "value": ""
+        },
+        {
+            "constraintType": "PARAMETER",
+            "message": "must not be blank",
+            "path": "createProduct.productInventory.sku",
+            "value": ""
+        }
+    ],
+    "propertyViolations": [],
+    "returnValueViolations": []
+}
+
+```
+
+* Vamos a implementar un mapeo de excepciones para personalizar este error
+
 ```java
-@NotBlank(message = "Name is mandatory and should be provided") 
-String name;
-```
-* Anotamos el parametro en el servicio rest con @Valid
-```java
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response createProduct(@Valid ProductInventory productInventory) {
-```  
-* Probamos el cambio en linea de comandos
-```shell
-http post localhost:8080/products sku=123 
-http localhost:8080/products/123 
-http post localhost:8080/products sku=123 name=my-product
-```
-* Vamos a añadir una validación al stock
-```java
-@PositiveOrZero
-private int unitsAvailable;
-```
-```shell
-http put localhost:8080/products/123 name=my-product unitsAvailable=-10
-```
-* Problemática PUT y POST con el ID. Añadimos @NotBlank
-```java
-   @NotNull
-   private String sku;
-```
-Probamos
-```shell
-http post localhost:8080/products name=my-product
-http put localhost:8080/products/KE180 name=KE180-Reborn
+ ./mvnw quarkus:remove-extension -Dextensions="quarkus-resteasy-jackson"
+ ./mvnw quarkus:remove-extension -Dextensions="quarkus-resteasy-jsonb"
 ```
   
-* Crear validation groups y probar de nuevo
-
+* Creamos la clase KinetecoExceptionMapper en el paquete validation
+  
 ```java
-package com.kineteco.model;
-
-import javax.validation.groups.Default;
-
-public interface ValidationGroups {
-   interface Put extends Default {
+@Provider
+public class KinetecoExceptionMapper implements ExceptionMapper<ConstraintViolationException> {
+   @Override
+   public Response toResponse(ConstraintViolationException e) {
+      return Response
+            .status(Response.Status.BAD_REQUEST)
+            .type(MediaType.APPLICATION_JSON_TYPE)
+            .entity(errorMessage(e)).build();
    }
-   interface Post extends Default {
+
+   private JsonObject errorMessage(ConstraintViolationException e) {
+      JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+
+      for (ConstraintViolation v : e.getConstraintViolations()) {
+         objectBuilder.add(v.getPropertyPath().toString(), v.getMessage());
+      }
+      return objectBuilder.build();
    }
 }
 ```
+* La clase implementa implements ExceptionMapper<ConstraintViolationException>. Implementamos con Json.
+  Un apunte sobre este API. Es el estándar viene con JsonB. Para eso he cambiado el marshalling de Jackson a Json b. El
+  api es estandard y limpio para manipular json en java.
 
-* Usar validation groups
-```java
-   @Null(groups = ValidationGroups.Put.class)
-   @NotBlank(groups = ValidationGroups.Post.class)
-    private String sku;
+* Vamos a utilizar una de las anotaciones de JAX-RS. @Provider. Esta anotación nos permite cambiar el funcionamiento en
+  ejecucción de la forma de funcionar de RestEasy en este caso y cambiar su comportamiento. En este caso vamos a proveer
+  una instancia que controla la asignacion de exceptiones.
+  
+* Volvemos a probar y vemos que la salida es mucho mas limpia.
+
+```json
+HTTP/1.1 400 Bad Request
+Content-Length: 139
+Content-Type: application/json
+
+{
+"createProduct.productInventory.name": "Name is mandatory and should be provided",
+"createProduct.productInventory.sku": "must not be blank"
+}
 ```
 
-Y en el Resource
-```java
-@POST
-@Consumes(MediaType.APPLICATION_JSON)
-public Response createProduct(@Valid @ConvertGroup(to = ValidationGroups.Post.class) ProductInventory productInventory) {
-
-@PUT
-@Path("/{sku}")
-@Consumes(MediaType.APPLICATION_JSON)
-public Response updateProduct(@PathParam("sku") String sku, @Valid @ConvertGroup(to = ValidationGroups.Put.class) ProductInventory productInventory) {
-
-```
-
-```shell
-http post localhost:8080/products name=my-product
-http put localhost:8080/products/KE180 name=my-product
-```
-
-Hibernate validator puede también utilizarse para la validacion de la configuración.
+Hemos aprendido a utilizar un proveedor de excepciones y así modificar el comportamiento y la valicación de campos de nuestra API
+REST para un control de errores más limpio.
