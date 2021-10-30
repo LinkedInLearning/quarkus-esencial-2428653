@@ -3,7 +3,6 @@ package com.kineteco;
 import com.kineteco.config.ProductInventoryConfig;
 import com.kineteco.model.ProductInventory;
 import com.kineteco.model.ValidationGroups;
-import com.kineteco.service.ProductInventoryService;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.jboss.logging.Logger;
 
@@ -23,14 +22,12 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 
 @Path("/products")
 public class ProductInventoryResource {
     private static final Logger LOGGER = Logger.getLogger(ProductInventoryResource.class);
-
-    @Inject
-    ProductInventoryService productInventoryService;
 
     @Inject
     ProductInventoryConfig productInventoryConfig;
@@ -47,7 +44,7 @@ public class ProductInventoryResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Collection<ProductInventory> listInventory() {
         LOGGER.debug("Product inventory list");
-        return productInventoryService.listInventory();
+        return new ArrayList<>();
     }
 
     @GET
@@ -55,7 +52,7 @@ public class ProductInventoryResource {
     @Path("/{sku}")
     public Response inventory(@PathParam("sku") String sku) {
         LOGGER.debugf("get by sku %s", sku);
-        ProductInventory productInventory = productInventoryService.getBySku(sku);
+        ProductInventory productInventory = null;
 
         if (productInventory == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -68,7 +65,7 @@ public class ProductInventoryResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createProduct(@Valid @ConvertGroup(to = ValidationGroups.Post.class) ProductInventory productInventory) {
         LOGGER.debugf("create %s", productInventory);
-        productInventoryService.addProductInventory(productInventory);
+
         return Response.created(URI.create(productInventory.getSku())).build();
     }
 
@@ -77,7 +74,7 @@ public class ProductInventoryResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateProduct(@PathParam("sku") String sku, @ConvertGroup(to = ValidationGroups.Put.class)  @Valid ProductInventory productInventory) {
         LOGGER.debugf("update %s", productInventory);
-        productInventoryService.updateProductInventory(sku, productInventory);
+
         return Response.accepted(productInventory).build();
     }
 
@@ -86,7 +83,7 @@ public class ProductInventoryResource {
     @Operation(summary = "Update the stock of a product by sku.", description = "Longer description that explains all.")
     public Response updateStock(@PathParam("sku") String sku, @QueryParam("stock") Integer stock) {
         LOGGER.debugf("get by sku %s", sku);
-        ProductInventory productInventory = productInventoryService.stockUpdate(sku, stock);
+        ProductInventory productInventory = null;
         if (productInventory == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -97,7 +94,7 @@ public class ProductInventoryResource {
     @Path("/{sku}")
     public Response delete(@PathParam("sku") String sku) {
         LOGGER.debugf("delete by sku %s", sku);
-        productInventoryService.delete(sku);
+
         return Response.accepted().build();
     }
 
