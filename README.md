@@ -16,6 +16,10 @@ kubectl create secret generic kineteco-credentials --from-literal=username=kinet
 ```shell
 kubectl apply -f kubernetes/postgres.yaml
 ```
+* Añadimos para importar el sql también en producción
+```properties
+quarkus.hibernate-orm.sql-load-script=import.sql
+```  
 
 * Configuramos el acceso a los secretos de kubernetes en nuestro servicio
 ```shell
