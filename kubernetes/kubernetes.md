@@ -8,6 +8,8 @@ minikube start --driver=virtualbox --cpus 4 --memory "8192mb"
 ## Limpiar Kubernetes (Minikube)
 ```shell
 eval $(minikube -p minikube docker-env)
+kubectl delete service postgres    
+kubectl delete deployment postgres
 kubectl delete service product-inventory-service      
 kubectl delete deployment product-inventory-service
 docker rmi (imageId)

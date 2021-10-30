@@ -1,68 +1,38 @@
 # Quarkus esencial
-## 05_05 Queries avanzadas con Hibernate Panache y Quarkus
+## 05_06 Despliegue en Kubernetes del Microservicio Quarkus y la base de datos
 
-* Not Found
+* Añadimos la extension kubernetes config si no la tenemos
+```shell
+ ./mvnw quarkus:add-extension -Dextensions="quarkus-kubernetes-config"
+```
+* Minikube arrancado y docker eval realizados
 
-```java
- ProductInventory existingProduct = ProductInventory.findBySku(sku);
-        if (productInventory == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        
- by
-
-ProductInventory existingProduct = ProductInventory.findBySku(sku);
-
-        
---- Probar primero con RuntimeException
-
-public static ProductInventory findBySku(String sku) {
-      return find("sku", sku)
-      .<ProductInventory>firstResultOptional()
-      .orElseThrow(()-> new RuntimeException());
-      }
-
---- Cambiar a NotFoundException
-public static ProductInventory findBySku(String sku) {
-      return find("sku", sku)
-      .<ProductInventory>firstResultOptional()
-      .orElseThrow(()-> new NotFoundException());
-      }
-
+* Vamos a crear los credenciales
+```shell
+kubectl create secret generic kineteco-credentials --from-literal=username=kineteco --from-literal=password=kineteco
 ```
 
-* Count
-
-```java
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    @Path("/line/{productLine}")
-    public Response productsCount(@PathParam("productLine") ProductLine productLine) {
-        LOGGER.debug("Count productLines");
-        return Response.ok(ProductInventory.count("productLine", productLine)).build();
-    }
+* Explicamos el YAML de postgress y lo desplegamos en kubernetes
+```shell
+kubectl apply -f kubernetes/postgres.yaml
 ```
 
-* Paging
-```java
-@GET
-@Produces(MediaType.APPLICATION_JSON)
-public Collection<ProductInventory> listInventory(@QueryParam("page") Integer page, @QueryParam("size") Integer size) {
-      LOGGER.debug("Product inventory list");
-      if (page == null && size == null) {
-      return ProductInventory.listAll();
-      }
-      PanacheQuery<ProductInventory> query = ProductInventory.findAll();
-      query.page(page, size);
-      return query.list();
-}
-
+* Configuramos el acceso a los secretos de kubernetes en nuestro servicio
+```shell
+%prod.quarkus.kubernetes-config.enabled=true
+%prod.quarkus.kubernetes-config.secrets.enabled=true
+%prod.quarkus.kubernetes-config.secrets=kineteco-credentials 
+```
+  
+* Configuramos la connexion 
+```properties
+%prod.quarkus.datasource.db-kind=postgresql
+%prod.quarkus.datasource.username=${username}
+%prod.quarkus.datasource.password=${password}
+%prod.quarkus.datasource.jdbc.url=jdbc:postgresql://postgres.default:5432/kineteco
 ```
 
-* Sorting
-
-```java
-///Quitamos el comentario del test y añadimos en inventario list
-
-PanacheQuery<ProductInventory> query = ProductInventory.findAll(Sort.by("name"));
+* Desplegamos nuestro servicio
+```shell
+./mvnw clean package -Dquarkus.kubernetes.deploy=true -DskipTests=true
 ```
