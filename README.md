@@ -7,7 +7,7 @@ En el ecosistema java Hibernate es desde hace años el framework más popular pa
 Hibernate Panache nos ayuda en concreto a realizar esto con Quarkus.
 
 Aprenderemos como utilizarlo con el patron Active Record.
-
+* Nos aseguramos de tener docker instalado, porque utilizaremos los DEV SERVICES de docker en desarrollo.
 * Añadimos las extensiones Panache, Postgres y H2 para los test.
 
 ```shell 
