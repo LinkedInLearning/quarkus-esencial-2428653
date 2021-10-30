@@ -1,12 +1,7 @@
 package com.kineteco.model;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.PositiveOrZero;
@@ -32,13 +27,10 @@ public class ProductInventory {
    private BigDecimal manufacturingCost;
    private BigDecimal price;
 
-   @Enumerated(EnumType.STRING)
    private ProductLine productLine;
 
-   @Convert(converter = ConsumerTypeConverter.class)
    private List<ConsumerType> targetConsumer = new ArrayList<>();
 
-   @Enumerated(EnumType.STRING)
    private ProductAvailability productAvailability;
 
    @PositiveOrZero
