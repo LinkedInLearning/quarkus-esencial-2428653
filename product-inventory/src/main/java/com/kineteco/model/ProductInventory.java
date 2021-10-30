@@ -1,7 +1,12 @@
 package com.kineteco.model;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.PositiveOrZero;
@@ -11,7 +16,8 @@ import java.util.List;
 import java.util.Objects;
 
 @RegisterForReflection
-public class ProductInventory {
+@Entity
+public class ProductInventory extends PanacheEntity {
 
    @Null(groups = ValidationGroups.Put.class)
    @NotBlank(groups = ValidationGroups.Post.class)
@@ -26,8 +32,13 @@ public class ProductInventory {
    private String footprint;
    private BigDecimal manufacturingCost;
    private BigDecimal price;
+   @Enumerated(EnumType.STRING)
    private ProductLine productLine;
+
+   @Convert(converter = ConsumerTypeConverter.class)
    private List<ConsumerType> targetConsumer = new ArrayList<>();
+
+   @Enumerated(EnumType.STRING)
    private ProductAvailability productAvailability;
 
    @PositiveOrZero
@@ -56,6 +67,20 @@ public class ProductInventory {
       this.targetConsumer = targetConsumer;
       this.productAvailability = productAvailability;
       this.unitsAvailable = unitsAvailable;
+   }
+
+   public static ProductInventory findBySku(String sku) {
+      return find("sku", sku).firstResult();
+   }
+
+   public static int findCurrentStock(String sku) {
+      UnitsAvailable unitsAvailable = find("sku", sku).project(UnitsAvailable.class).firstResult();
+
+      if (unitsAvailable == null) {
+         return 0;
+      }
+
+      return unitsAvailable.unitsAvailable;
    }
 
    @Override
