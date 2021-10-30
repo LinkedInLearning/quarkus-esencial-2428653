@@ -44,7 +44,7 @@ public class ProductInventoryResourceTest {
               .get("/products")
               .then()
               .statusCode(Response.Status.OK.getStatusCode())
-              .body("$.size()", is(52));
+              .body("$.size()", is(53));
     }
 
     @Test
