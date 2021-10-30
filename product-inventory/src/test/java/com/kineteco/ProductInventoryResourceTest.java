@@ -41,12 +41,11 @@ public class ProductInventoryResourceTest {
 
     @Test
     public void testListProducts() {
-        Collection<ProductInventory> products = given().when()
+        given().when()
               .get("/products")
               .then()
               .statusCode(Response.Status.OK.getStatusCode())
-              .extract().body().as(Collection.class);
-        assertThat(products).size().isGreaterThanOrEqualTo(52);
+              .body("$.size()", is(52));
     }
 
     @Test
