@@ -43,7 +43,7 @@ Aprenderemos como utilizarlo con el patron Active Record.
 
 ```
 
-Si quisieramos cortar el acceso a la base de datos para probar los recursos y el api por un lado sin base de datos,
+Si quisiéramos cortar el acceso a la base de datos para probar los recursos y el api por un lado sin base de datos,
 nos podemos encontrar con el problema de mock con mockito. Pero afortunadamente utilizando la extension quarkus-panache-mock
 podemos desacoplar los tests.
 
