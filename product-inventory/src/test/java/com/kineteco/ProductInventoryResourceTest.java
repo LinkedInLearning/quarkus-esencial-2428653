@@ -2,12 +2,12 @@ package com.kineteco;
 
 import com.kineteco.model.ConsumerType;
 import com.kineteco.model.ProductInventory;
+import com.kineteco.model.ProductLine;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 
 import javax.ws.rs.core.Response;
-import java.util.Collection;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,11 +41,14 @@ public class ProductInventoryResourceTest {
 
     @Test
     public void testListProducts() {
-        given().when()
+        ProductInventory[] inventory = given().when()
               .get("/products")
               .then()
               .statusCode(Response.Status.OK.getStatusCode())
-              .body("$.size()", is(53));
+              .body("$.size()", is(53))
+              .extract().as(ProductInventory[].class);
+        assertThat(inventory).hasSize(53);
+        assertThat(inventory[0].getName()).isEqualTo("K-Eco 180");
     }
 
     @Test
@@ -111,5 +114,34 @@ public class ProductInventoryResourceTest {
               .extract().body().as(ProductInventory.class);
 
         assertThat(productInventoryAfter.getUnitsAvailable()).isEqualTo(productInventoryPre.getUnitsAvailable() + 3);
+    }
+
+    @Test
+    public void testUpdateNotFound() {
+        given().when().get("/products/{sku}", "foo")
+              .then()
+              .statusCode(Response.Status.NOT_FOUND.getStatusCode());
+    }
+
+    @Test
+    public void testCountProductLine() {
+        given()
+              .when().get("/products/line/{productLine}", ProductLine.DELUXE)
+              .then()
+              .statusCode(200)
+              .body(is("3"));
+    }
+
+    @Test
+    public void testPaginationProducts() {
+        ProductInventory[] inventory =
+              given().queryParam("page", 1)
+                    .queryParam("size", 10)
+                    .when().get("/products/")
+                    .then().statusCode(200)
+                    .extract().as(ProductInventory[].class);
+
+        assertThat(inventory).hasSize(10);
+//        assertThat(inventory[0].getName()).isEqualTo("K-Eco 300");
     }
 }
