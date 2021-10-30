@@ -3,7 +3,6 @@ package com.kineteco;
 import com.kineteco.config.ProductInventoryConfig;
 import com.kineteco.model.ProductInventory;
 import com.kineteco.model.ProductLine;
-import com.kineteco.model.UnitsAvailable;
 import com.kineteco.model.ValidationGroups;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Sort;
@@ -27,7 +26,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
 
 @Path("/products")
