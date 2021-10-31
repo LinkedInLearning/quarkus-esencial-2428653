@@ -133,6 +133,15 @@ public class ProductInventoryResourceTest {
     }
 
     @Test
+    public void getProductStock() {
+        given()
+              .when().get("/products/{sku}/stock", "KE180")
+              .then()
+              .statusCode(200)
+              .body(is("1456"));
+    }
+
+    @Test
     public void testPaginationProducts() {
         ProductInventory[] inventory =
               given().queryParam("page", 1)

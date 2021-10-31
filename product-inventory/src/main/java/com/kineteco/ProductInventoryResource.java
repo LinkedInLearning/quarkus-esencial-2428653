@@ -23,6 +23,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
@@ -62,6 +64,15 @@ public class ProductInventoryResource {
         LOGGER.debugf("get by sku %s", sku);
         ProductInventory productInventory = ProductInventory.findBySku(sku);
         return Response.ok(productInventory).build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{sku}/stock")
+    public Response getStock(@PathParam("sku") String sku, @Context HttpHeaders headers) {
+        LOGGER.debugf("getStock by sku %s", sku);
+        LOGGER.debug(headers.getRequestHeaders());
+        return Response.ok(ProductInventory.findCurrentStock(sku)).build();
     }
 
     @POST
