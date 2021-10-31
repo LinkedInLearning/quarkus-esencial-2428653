@@ -1,73 +1,93 @@
 # Quarkus esencial
-## 06_02 Comunicar servicios mediante un cliente REST con inyección de dependencias en Quarkus
+## 06_03 Test unitarios con WireMock y Quarkus
 
-* Añadimos las extensiones
-```shell
-  ./mvnw quarkus:add-extension -Dextensions="rest-client,rest-client-jackson"
+El problema que necesitamos solucionar ahora es que los tests que vayamos a realizar de nuestro SalesResource dependen
+de que un servicio esté arrancado, necesitamos poder simular su comportamiento.
+Para ello utilizamos Wiremock.
+
+* Añadimos test
+
+```java
+@Test
+public void testAvailability() {
+      given()
+      .queryParam("units", 30)
+      .when().get("/sales/{sku}/availability", "123")
+      .then()
+      .statusCode(200)
+      .body(is("true"));
+
+      given()
+      .queryParam("units", 43)
+      .when().get("/sales/{sku}/availability", "123")
+      .then()
+      .statusCode(200)
+      .body(is("false"));
+      }
 ```
-* Arrancamos en modo desarrollo y cambiamos la version `%dev.quarkus.http.port=8280` para no tener conflicto con product inventory
-* Creamos la interfaz 'ProductInventoryService' anotada con @RegisterRestClient
-* Vamos a anotar la clase con @Path y crearemos el método
+Comprobamos que falla por no tener el servicio up
 
-```java
-@Path("/products")
-@RegisterRestClient(configKey = "kineteco-product-inventory")
-@Produces(MediaType.APPLICATION_JSON)
-@ClientHeaderParam(name = "caller-header", value = "sales-service")
-@RegisterClientHeaders
-public interface ProductInventoryService {
-
-  @GET
-  @Path("/{sku}/stock")
-  @ClientHeaderParam(name = "method-header", value = "stock")
-  Integer getStock(@PathParam("sku") String sku);
-}
+* Añadimos la dependencia a maven para desacoplar los tests unitarios del servicio
+```xml
+    <dependency>
+      <groupId>com.github.tomakehurst</groupId>
+      <artifactId>wiremock-jre8</artifactId>
+      <version>2.27.1</version>
+      <scope>test</scope>
+    </dependency>
 ```
 
-* Podemos usar un API programática para esto mismo, pero vamos a utilizar la inyección de dependencias de CDI
-  @Inject junto a @RestClient
+* Creamos una clase llamada ProductInventoryWiremock que va implementar QuarkusTestResourceLifecycleManager
+  
+* Vamos a implementar onStart y onStop que se llamaran al inicio de un test unitario y al final respectivamente
 ```java
-@Inject
-@RestClient
-ProductInventoryService productInventoryService;
-```  
+package com.kineteco;
 
-* Implementamos
-```java
-@GET
-@Produces(MediaType.TEXT_PLAIN)
-@Path("/{sku}/available")
-public Boolean available(@PathParam("sku") String sku, @QueryParam("units") Integer units) {
-  if (units == null) {
-  throw new BadRequestException("units query parameter is mandatory");
+import com.github.tomakehurst.wiremock.WireMockServer;
+import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
+
+import java.util.Collections;
+import java.util.Map;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+
+public class ProductInventoryWiremock implements QuarkusTestResourceLifecycleManager {
+  private WireMockServer wireMockServer;
+
+  @Override
+  public Map<String, String> start() {
+    wireMockServer = new WireMockServer();
+    wireMockServer.start();
+
+    stubFor(get(urlEqualTo("/products/123/stock"))
+        .willReturn(aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBody("42")
+        ));
+
+    return Collections.singletonMap("kineteco-product-inventory/mp-rest/url", wireMockServer.baseUrl());
   }
-  return productInventoryService.getStock(sku) >= units;
+
+  @Override
+  public void stop() {
+    if (null != wireMockServer) {
+      wireMockServer.stop();
+    }
+  }
 }
 ```  
-* Configuraamos kineteco-product-inventory/mp-rest/url=http://localhost:8080
-```properties
-kineteco-product-inventory/mp-rest/url=http://localhost:8080
-```
-
-Comprobamos que el endpoint de productos esta disponible con
-```shell
-http http://localhost:8080/products/`
-http http://localhost:8081/sales/KE36Li/availability\?units\=300
-http http://localhost:8081/sales/KE36Li/availability\?units\=900
-````
-
-Ahora que sabemos comunicar en local, nos queda desplegar a kubernetes.
-* Tenemos minikube arrancado y docker y la base de datos y product inventory desplegados
-* Configuramos el acceso a prod
-```properties
- `%prod.kineteco-product-inventory/mp-rest/url=http://product-inventory-service:80`
-``` 
-* Desplegamos sales service con 
-```shell
-./mvnw clean package -Dquarkus.kubernetes.deploy=true -DskipTests=true
+* Implementamos ambos métodos y cambiamos la clase unitaria para que use el mock @QuarkusTestResource(ProductInventoryWiremock.class)
+```java
+@QuarkusTest
+@QuarkusTestResource(ProductInventoryWiremock.class)
+public class SalesResourceTest {
+   ...
+}
 ```  
+* Comprobamos que ahora podemos ejecutar test unitarios sin necesidad de tener los servicios up and running
 
-```shell
-http http://URL-KUBERNETES/sales/KE36Li/availability\?units\=300
-http http://localhost:8081/sales/KE36Li/availability\?units\=900
-```
+Hemos aprendido a como implementar test unitarios robustos sin necesidad de tener los servicios. Eso no excluye
+que no pongamos disponer de una bateria de tests importante que pruebe la integracion correcta entre los microservicios.
