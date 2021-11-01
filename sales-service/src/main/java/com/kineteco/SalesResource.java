@@ -27,7 +27,7 @@ public class SalesResource {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    @Path("/{sku}/available")
+    @Path("/{sku}/availability")
     public Boolean available(@PathParam("sku") String sku, @QueryParam("units") Integer units) {
         if (units == null) {
             throw new BadRequestException("units query parameter is mandatory");
