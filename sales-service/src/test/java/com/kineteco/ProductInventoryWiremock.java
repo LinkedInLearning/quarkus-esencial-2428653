@@ -18,7 +18,12 @@ public class ProductInventoryWiremock implements QuarkusTestResourceLifecycleMan
    public Map<String, String> start() {
       wireMockServer = new WireMockServer();
       wireMockServer.start();
+      stubOk();
+      stubTimeout();
+      return Collections.singletonMap("kineteco-product-inventory/mp-rest/url", wireMockServer.baseUrl());
+   }
 
+   private void stubOk() {
       stubFor(get(urlEqualTo("/products/123/stock"))
             .willReturn(aResponse()
                   .withHeader("Content-Type", "application/json")
@@ -30,14 +35,15 @@ public class ProductInventoryWiremock implements QuarkusTestResourceLifecycleMan
                   .withHeader("Content-Type", "application/json")
                   .withBody("2")
             ));
+   }
 
+   static void stubTimeout() {
       stubFor(get(urlEqualTo("/products/falloTimeout/stock"))
             .willReturn(aResponse()
                   .withHeader("Content-Type", "application/json")
+                  .withFixedDelay(150)
                   .withBody("42")
             ));
-
-      return Collections.singletonMap("kineteco-product-inventory/mp-rest/url", wireMockServer.baseUrl());
    }
 
    @Override
