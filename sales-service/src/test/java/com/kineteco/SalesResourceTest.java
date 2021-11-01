@@ -37,4 +37,12 @@ public class SalesResourceTest {
             .body(is("false"));
    }
 
+   @Test
+   public void testAvailabilityTimeout() {
+      given()
+            .queryParam("units", 42)
+            .when().get("/sales/{sku}/availability", "falloTimeout")
+            .then()
+            .statusCode(500);
+   }
 }
