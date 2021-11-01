@@ -1,93 +1,46 @@
 # Quarkus esencial
-## 06_03 Test unitarios con WireMock y Quarkus
+## 07_02 Tolerancia a fallos con Quarkus: Timeout
 
-El problema que necesitamos solucionar ahora es que los tests que vayamos a realizar de nuestro SalesResource dependen
-de que un servicio esté arrancado, necesitamos poder simular su comportamiento.
-Para ello utilizamos Wiremock.
+Las llamadas entre microservicios sufren de latencia, más o menos larga, que podemos considerar normal.
+Los tiempos de respuesta optimos es algo que debemos de decidir en cada caso.
+Para evitar que un hilo de llamada externa se quede bloqueado demasiado tiempo, utilizaremos la estrategia timeout.
 
-* Añadimos test
+* Añadimos la extensión `smallrye-fault-tolerance`
+```shell
+./mvnw quarkus:add-extension -Dextensions="smallrye-fault-tolerance" 
+```
+* Abrimos ProductInventoryService en sales service, la clase que encapsula la llamada externa.
+* Anotamos con `@Timeout`. Enseñamos que por defecto son 1000 ms, podemos darle otro valor
+  Esta anotación hará que un TimeoutException sea lanzada cuando el servicio no responde antes de 1000 ms.
+* Para probar el funcionamiento, vamos a utilizar el test que emula el servicio externo con WireMock
+* Creamos un nuevo test para probar el timeout
 
 ```java
-@Test
-public void testAvailability() {
+ @Test
+   public void testAvailabilityTimeout() {
       given()
-      .queryParam("units", 30)
-      .when().get("/sales/{sku}/availability", "123")
-      .then()
-      .statusCode(200)
-      .body(is("true"));
-
-      given()
-      .queryParam("units", 43)
-      .when().get("/sales/{sku}/availability", "123")
-      .then()
-      .statusCode(200)
-      .body(is("false"));
-      }
-```
-Comprobamos que falla por no tener el servicio up
-
-* Añadimos la dependencia a maven para desacoplar los tests unitarios del servicio
-```xml
-    <dependency>
-      <groupId>com.github.tomakehurst</groupId>
-      <artifactId>wiremock-jre8</artifactId>
-      <version>2.27.1</version>
-      <scope>test</scope>
-    </dependency>
+            .queryParam("units", 43)
+            .when().get("/sales/{sku}/availability", "falloTimeout")
+            .then()
+            .statusCode(200);
+   }
 ```
 
-* Creamos una clase llamada ProductInventoryWiremock que va implementar QuarkusTestResourceLifecycleManager
-  
-* Vamos a implementar onStart y onStop que se llamaran al inicio de un test unitario y al final respectivamente
+* Añadimos un nuevo caso de mock en `ProductInventoryWiremock`.
+  `withFixedDelay(2000)` significa que el servicio para el id 'falloTimeout' tardará 2 segundos en responder.
+
 ```java
-package com.kineteco;
+ stubFor(get(urlEqualTo("/products/falloTimeout/stock"))
+          .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withFixedDelay(2000)
+                .withBody("42")
+          ));
+```
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
+* Lanzamos el test unitario, vemos que la respuesta no es 200, sino 500. Cambiamos el estado a  .statusCode(200);
+* Para acelerar el proceso y que no espere 1 segundo, podemos cambiar el tiempo de espera en la anotación @Timeout
 
-import java.util.Collections;
-import java.util.Map;
+Hemos aprendido a utilizar la estrategia de Timeout para forzar el fallo a aplicar en tiempos de respuesta demasiado
+largos y no aceptables para nuestro servicio y evitar que los recursos se queden bloquedos demasiado tiempo.
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-
-public class ProductInventoryWiremock implements QuarkusTestResourceLifecycleManager {
-  private WireMockServer wireMockServer;
-
-  @Override
-  public Map<String, String> start() {
-    wireMockServer = new WireMockServer();
-    wireMockServer.start();
-
-    stubFor(get(urlEqualTo("/products/123/stock"))
-        .willReturn(aResponse()
-            .withHeader("Content-Type", "application/json")
-            .withBody("42")
-        ));
-
-    return Collections.singletonMap("kineteco-product-inventory/mp-rest/url", wireMockServer.baseUrl());
-  }
-
-  @Override
-  public void stop() {
-    if (null != wireMockServer) {
-      wireMockServer.stop();
-    }
-  }
-}
-```  
-* Implementamos ambos métodos y cambiamos la clase unitaria para que use el mock @QuarkusTestResource(ProductInventoryWiremock.class)
-```java
-@QuarkusTest
-@QuarkusTestResource(ProductInventoryWiremock.class)
-public class SalesResourceTest {
-   ...
-}
-```  
-* Comprobamos que ahora podemos ejecutar test unitarios sin necesidad de tener los servicios up and running
-
-Hemos aprendido a como implementar test unitarios robustos sin necesidad de tener los servicios. Eso no excluye
-que no pongamos disponer de una bateria de tests importante que pruebe la integracion correcta entre los microservicios.
