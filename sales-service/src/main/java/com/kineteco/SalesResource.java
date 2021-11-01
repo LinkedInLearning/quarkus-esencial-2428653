@@ -1,7 +1,9 @@
 package com.kineteco;
 
 import com.kineteco.api.ProductInventoryService;
+import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.faulttolerance.Timeout;
+import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
@@ -33,6 +35,7 @@ public class SalesResource {
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/{sku}/availability")
     @Timeout(value = 100)
+    @Retry(retryOn = TimeoutException.class, delay = 100, jitter = 25)
     public Boolean available(@PathParam("sku") String sku, @QueryParam("units") Integer units) {
         LOGGER.debugf("available %s %d", sku, units);
         if (units == null) {
