@@ -45,4 +45,14 @@ public class SalesResourceTest {
             .then()
             .statusCode(500);
    }
+
+   @Test
+   public void testAvailabilityRetry() {
+      given()
+            .queryParam("units", 42)
+            .when().get("/sales/{sku}/availability", "falloRetry")
+            .then()
+            .statusCode(200)
+            .body(is("true"));;
+   }
 }

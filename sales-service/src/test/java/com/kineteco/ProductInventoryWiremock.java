@@ -1,6 +1,7 @@
 package com.kineteco;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.stubbing.Scenario;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 
 import java.util.Collections;
@@ -20,6 +21,7 @@ public class ProductInventoryWiremock implements QuarkusTestResourceLifecycleMan
       wireMockServer.start();
       stubOk();
       stubTimeout();
+      stubRetry();
       return Collections.singletonMap("kineteco-product-inventory/mp-rest/url", wireMockServer.baseUrl());
    }
 
@@ -42,6 +44,37 @@ public class ProductInventoryWiremock implements QuarkusTestResourceLifecycleMan
             .willReturn(aResponse()
                   .withHeader("Content-Type", "application/json")
                   .withFixedDelay(150)
+                  .withBody("42")
+            ));
+   }
+
+   static void stubRetry() {
+      stubFor(get(urlEqualTo("/products/falloRetry/stock"))
+            .inScenario("retry")
+            .whenScenarioStateIs(Scenario.STARTED)
+            .willSetStateTo("120-milliseconds")
+            .willReturn(aResponse()
+                  .withHeader("Content-Type", "application/json")
+                  .withFixedDelay(150)
+                  .withBody("42")
+            ));
+
+      stubFor(get(urlEqualTo("/products/falloRetry/stock"))
+            .inScenario("retry")
+            .whenScenarioStateIs("120-milliseconds")
+            .willSetStateTo("50-milliseconds")
+            .willReturn(aResponse()
+                  .withHeader("Content-Type", "application/json")
+                  .withFixedDelay(120)
+                  .withBody("42")
+            ));
+
+      stubFor(get(urlEqualTo("/products/falloRetry/stock"))
+            .inScenario("retry")
+            .whenScenarioStateIs("50-milliseconds")
+            .willReturn(aResponse()
+                  .withHeader("Content-Type", "application/json")
+                  .withFixedDelay(50)
                   .withBody("42")
             ));
    }

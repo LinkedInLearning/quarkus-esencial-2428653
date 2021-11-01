@@ -1,46 +1,30 @@
 # Quarkus esencial
-## 07_02 Tolerancia a fallos con Quarkus: Timeout
+## 07_02 Tolerancia a fallos con Quarkus: Retry
 
-Las llamadas entre microservicios sufren de latencia, más o menos larga, que podemos considerar normal.
-Los tiempos de respuesta optimos es algo que debemos de decidir en cada caso.
-Para evitar que un hilo de llamada externa se quede bloqueado demasiado tiempo, utilizaremos la estrategia timeout.
+Cuando una llamada falla, puede ser que sea por un fallo temporal o una latencia concreta. En algunos casos queremos
+que automáticamente se vuelva a intentar la llamada, al menos unas cuantas veces más, para evitar que nuestro servicio que
+depende de una llamada a otro falle a menudo.
 
-* Añadimos la extensión `smallrye-fault-tolerance`
-```shell
-./mvnw quarkus:add-extension -Dextensions="smallrye-fault-tolerance" 
-```
-* Abrimos ProductInventoryService en sales service, la clase que encapsula la llamada externa.
-* Anotamos con `@Timeout`. Enseñamos que por defecto son 1000 ms, podemos darle otro valor
-  Esta anotación hará que un TimeoutException sea lanzada cuando el servicio no responde antes de 1000 ms.
-* Para probar el funcionamiento, vamos a utilizar el test que emula el servicio externo con WireMock
-* Creamos un nuevo test para probar el timeout
+Para ello utilizaremos la estrategia Retry.
 
+* Nos aseguramos que la extension `quarkus-smallrye-fault-tolerance` está como dependencia del servicio Quarkus.
+* Abrimos `ProductInventoryService` y vamos a utilizar la anotación `@Retry`
 ```java
- @Test
-   public void testAvailabilityTimeout() {
-      given()
-            .queryParam("units", 43)
-            .when().get("/sales/{sku}/availability", "falloTimeout")
-            .then()
-            .statusCode(200);
-   }
-```
+@Retry(retryOn = TimeoutException.class, delay = 100, jitter = 25)
+``` 
 
-* Añadimos un nuevo caso de mock en `ProductInventoryWiremock`.
-  `withFixedDelay(2000)` significa que el servicio para el id 'falloTimeout' tardará 2 segundos en responder.
+* Lanzamos el test y vemos que tarda más en ejecutarse.
+* Explicamos el escenario de los test
 
-```java
- stubFor(get(urlEqualTo("/products/falloTimeout/stock"))
-          .willReturn(aResponse()
-                .withHeader("Content-Type", "application/json")
-                .withFixedDelay(2000)
-                .withBody("42")
-          ));
-```
 
-* Lanzamos el test unitario, vemos que la respuesta no es 200, sino 500. Cambiamos el estado a  .statusCode(200);
-* Para acelerar el proceso y que no espere 1 segundo, podemos cambiar el tiempo de espera en la anotación @Timeout
+- maxRetrys que es 3 por defecto, nos permite configurar cuantas veces queremos volver a llamar el servicio antes de
+  fallar definitivamente
+- delay: indica cuanto tiempo debe esperarse entre
+- retryOn: permite filtrar el tipo de excepción por la que queremos re intentarlo. Al utilizar la estrategia timeout,
+  si ponemos la excepción se intentará de nuevo la llamada en caso de obtener un TimeoutException gestionado por Timeout.
+- jitter permite incrementar o decremetar el intervalo de tiempos entre las llamadas.
 
-Hemos aprendido a utilizar la estrategia de Timeout para forzar el fallo a aplicar en tiempos de respuesta demasiado
-largos y no aceptables para nuestro servicio y evitar que los recursos se queden bloquedos demasiado tiempo.
 
+Hemos aprendido como re intentar una llamada fallida, en el caso de un timeout por ejemplo.
+La estrategia Retry debe de utilizarse con precaución, ya que reintentar multiples veces en intervalos cortos un servicio
+que esté sobrecargado por alguna razón puede empeorar la situación.
