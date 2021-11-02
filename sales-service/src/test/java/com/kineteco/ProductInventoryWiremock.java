@@ -91,7 +91,7 @@ public class ProductInventoryWiremock implements QuarkusTestResourceLifecycleMan
             ));
 
       stubFor(get(urlEqualTo("/products/fallback_2/stock"))
-            .willReturn(serviceUnavailable()));
+            .willReturn(aResponse().withStatus(500)));
    }
 
    @Override

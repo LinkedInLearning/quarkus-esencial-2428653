@@ -67,7 +67,7 @@ public class SalesResourceTest {
             .when().get("/sales/{sku}/availability", "fallback_1")
             .then()
             .statusCode(200)
-            .body(is("true"));;
+            .body(is("true"));
    }
 
    @Test
