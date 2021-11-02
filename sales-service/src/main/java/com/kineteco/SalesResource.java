@@ -59,12 +59,6 @@ public class SalesResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Timeout(value = 100)
-    @CircuitBreaker(
-          requestVolumeThreshold=3,
-          failureRatio = 0.66,
-          delay = 1,
-          delayUnit = ChronoUnit.SECONDS
-    )
     @Fallback(value = SalesServiceFallbackHandler.class)
     public Response createDeluxeCommand(CustomerCommand command) {
         Product product = productInventoryService.inventory(command.getSku());

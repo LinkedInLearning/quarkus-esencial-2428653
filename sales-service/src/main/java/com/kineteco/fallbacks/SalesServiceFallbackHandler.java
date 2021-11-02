@@ -22,9 +22,6 @@ public class SalesServiceFallbackHandler implements FallbackHandler<Response> {
          case "TimeoutException" :
             response = timeout(context);
             break;
-         case "CircuitBreakerOpenException":
-            response = Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-            break;
          case "ResteasyWebApplicationException":
             response =  Response.status(Response.Status.BAD_GATEWAY).build();
             break;

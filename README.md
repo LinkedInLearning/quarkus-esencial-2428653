@@ -24,16 +24,10 @@ crear pedidos deluxe.
 * Creamos un SalesServiceFallbackHandler
 ```java
  public SalesServiceFallbackHandler implements FallbackHandler<Response> {
-      if (context.getFailure() instanceof TimeoutException) {
-       return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
-      }
-
-      if (context.getFailure() instanceof CircuitBreakerOpenException) {
-         return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-      }
-      
-      
-      serverError()
+        case "CircuitBreakerOpenException":
+        response = Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+        break;
+        
 }
 ```
 
