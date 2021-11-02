@@ -4,6 +4,8 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
+import javax.ws.rs.core.Response;
+
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 
@@ -43,7 +45,7 @@ public class SalesResourceTest {
             .queryParam("units", 42)
             .when().get("/sales/{sku}/availability", "falloTimeout")
             .then()
-            .statusCode(500);
+            .statusCode(Response.Status.GATEWAY_TIMEOUT.getStatusCode());
    }
 
    @Test
@@ -54,5 +56,26 @@ public class SalesResourceTest {
             .then()
             .statusCode(200)
             .body(is("true"));;
+   }
+
+
+
+   @Test
+   public void testAvailabilityFallbackTimeoutLessThanTwoUnits() {
+      given()
+            .queryParam("units", 2)
+            .when().get("/sales/{sku}/availability", "fallback_1")
+            .then()
+            .statusCode(200)
+            .body(is("true"));;
+   }
+
+   @Test
+   public void testAvailabilityFallbackHandler() {
+      given()
+            .queryParam("units", 2)
+            .when().get("/sales/{sku}/availability", "fallback_2")
+            .then()
+            .statusCode(Response.Status.BAD_GATEWAY.getStatusCode());
    }
 }
