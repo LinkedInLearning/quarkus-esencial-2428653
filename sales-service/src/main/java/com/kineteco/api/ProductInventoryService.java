@@ -21,4 +21,8 @@ public interface ProductInventoryService {
    @Path("/{sku}/stock")
    @ClientHeaderParam(name = "method-header", value = "stock")
    Integer getStock(@PathParam("sku") String sku);
+
+   @GET
+   @Path("/{sku}")
+   Product inventory(@PathParam("sku") String sku);
 }

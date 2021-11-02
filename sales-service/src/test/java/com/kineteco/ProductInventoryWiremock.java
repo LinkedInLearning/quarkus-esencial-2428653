@@ -25,6 +25,7 @@ public class ProductInventoryWiremock implements QuarkusTestResourceLifecycleMan
       stubTimeout();
       stubRetry();
       stubFallback();
+      stubCircuitBreaker();
       return Collections.singletonMap("kineteco-product-inventory/mp-rest/url", wireMockServer.baseUrl());
    }
 
@@ -92,6 +93,46 @@ public class ProductInventoryWiremock implements QuarkusTestResourceLifecycleMan
 
       stubFor(get(urlEqualTo("/products/fallback_2/stock"))
             .willReturn(serviceUnavailable()));
+   }
+
+   static void stubCircuitBreaker() {
+      // Circuit breaker scenario
+      stubFor(get(urlEqualTo("/products/circuitBreaker"))
+            .inScenario("circuitBreaker")
+            .whenScenarioStateIs(Scenario.STARTED)
+            .willSetStateTo("timeout-1")
+            .willReturn(aResponse()
+                  .withHeader("Content-Type", "application/json")
+                  .withBody("{\"sku\": \"circuitBreaker\", \"productLine\": \"DELUXE\"}")
+            ));
+
+      // Da un timeout 1 vez
+      stubFor(get(urlEqualTo("/products/circuitBreaker"))
+            .inScenario("circuitBreaker")
+            .whenScenarioStateIs("timeout-1")
+            .willSetStateTo("timeout-2")
+            .willReturn(aResponse()
+                  .withHeader("Content-Type", "application/json")
+                  .withFixedDelay(150)
+            ));
+
+      // Da un timeout 2 vez
+      stubFor(get(urlEqualTo("/products/circuitBreaker"))
+            .inScenario("circuitBreaker")
+            .whenScenarioStateIs("timeout-2")
+            .willSetStateTo("success")
+            .willReturn(aResponse()
+                  .withHeader("Content-Type", "application/json")
+                  .withFixedDelay(150)
+            ));
+
+      stubFor(get(urlEqualTo("/products/circuitBreaker"))
+            .inScenario("circuitBreaker")
+            .whenScenarioStateIs("success")
+            .willReturn(aResponse()
+                  .withHeader("Content-Type", "application/json")
+                  .withBody("{\"sku\": \"circuitBreaker\", \"productLine\": \"DELUXE\"}")
+            ));
    }
 
    @Override
