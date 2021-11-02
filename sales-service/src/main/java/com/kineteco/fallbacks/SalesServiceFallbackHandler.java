@@ -2,8 +2,6 @@ package com.kineteco.fallbacks;
 
 import org.eclipse.microprofile.faulttolerance.ExecutionContext;
 import org.eclipse.microprofile.faulttolerance.FallbackHandler;
-import org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenException;
-import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException;
 import org.jboss.logging.Logger;
 
 import javax.ws.rs.core.Response;
@@ -24,6 +22,9 @@ public class SalesServiceFallbackHandler implements FallbackHandler<Response> {
             break;
          case "CircuitBreakerOpenException":
             response = Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+            break;
+         case "BulkheadException":
+            response = Response.status(Response.Status.TOO_MANY_REQUESTS).build();
             break;
          case "ResteasyWebApplicationException":
             response =  Response.status(Response.Status.BAD_GATEWAY).build();
