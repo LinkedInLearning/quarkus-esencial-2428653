@@ -3,7 +3,6 @@ package com.kineteco;
 import com.kineteco.api.Product;
 import com.kineteco.api.ProductInventoryService;
 import com.kineteco.fallbacks.SalesServiceFallbackHandler;
-import org.eclipse.microprofile.faulttolerance.CircuitBreaker;
 import org.eclipse.microprofile.faulttolerance.Fallback;
 import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.faulttolerance.Timeout;
@@ -23,7 +22,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Path("/sales")
