@@ -1,7 +1,6 @@
 package com.kineteco;
 
 import com.kineteco.api.ProductInventoryService;
-import org.eclipse.microprofile.faulttolerance.Fallback;
 import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.faulttolerance.Timeout;
 import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException;
@@ -38,8 +37,6 @@ public class SalesResource {
     @Path("/{sku}/availability")
     @Timeout(value = 100)
     @Retry(retryOn = TimeoutException.class, delay = 100, jitter = 25)
-//    @Fallback(fallbackMethod = "fallbackAvailable", applyOn = TimeoutException.class)
-    @Fallback(value = AvailableProductFallbackHandler.class)
     public Response available(@PathParam("sku") String sku, @QueryParam("units") Integer units) {
         LOGGER.debugf("available %s %d", sku, units);
         if (units == null) {
@@ -48,11 +45,4 @@ public class SalesResource {
         return Response.ok(productInventoryService.getStock(sku) >= units).build();
     }
 
-    public Response fallbackAvailable(String sku, Integer units) {
-        if (units <= 2) {
-            return Response.ok(true).build();
-        }
-
-        return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
-    }
 }
