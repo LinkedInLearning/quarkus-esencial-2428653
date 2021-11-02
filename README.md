@@ -39,7 +39,7 @@ public class AvailableProductFallbackHandler implements FallbackHandler<Response
    @Override
    public Response handle(ExecutionContext context) {
       String exceptionName = "";
-      if (context.getFailure().getCause() == null) {                  // <3>
+      if (context.getFailure().getCause() == null) {                 
          exceptionName = context.getFailure() .getClass().getSimpleName();
       } else {
          exceptionName = context.getFailure().getCause().getClass().getSimpleName();
