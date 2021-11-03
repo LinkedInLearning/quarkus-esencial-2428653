@@ -10,6 +10,7 @@ import javax.persistence.Enumerated;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.PositiveOrZero;
+import javax.ws.rs.NotFoundException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +71,9 @@ public class ProductInventory extends PanacheEntity {
    }
 
    public static ProductInventory findBySku(String sku) {
-      return find("sku", sku).firstResult();
+      return find("sku", sku)
+            .<ProductInventory>firstResultOptional()
+            .orElseThrow(()-> new NotFoundException());
    }
 
    public static int findCurrentStock(String sku) {

@@ -2,7 +2,10 @@ package com.kineteco;
 
 import com.kineteco.config.ProductInventoryConfig;
 import com.kineteco.model.ProductInventory;
+import com.kineteco.model.ProductLine;
 import com.kineteco.model.ValidationGroups;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.panache.common.Sort;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.jboss.logging.Logger;
 
@@ -42,9 +45,23 @@ public class ProductInventoryResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<ProductInventory> listInventory() {
+    public Collection<ProductInventory> listInventory(@QueryParam("page") Integer page, @QueryParam("size") Integer size) {
         LOGGER.debug("Product inventory list");
-        return ProductInventory.listAll();
+        if (page == null || size == null) {
+            return ProductInventory.listAll();
+        }
+        PanacheQuery<ProductInventory> query = ProductInventory.findAll(Sort.by("name"));
+        query.page(page, size);
+
+        return query.list();
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/line/{productLine}")
+    public Response productsCount(@PathParam("productLine") ProductLine productLine) {
+        LOGGER.debug("Count productLines");
+        return Response.ok(ProductInventory.count("productLine", productLine)).build();
     }
 
     @GET
@@ -77,9 +94,6 @@ public class ProductInventoryResource {
     public Response updateProduct(@PathParam("sku") String sku, @ConvertGroup(to = ValidationGroups.Put.class)  @Valid ProductInventory productInventory) {
         LOGGER.debugf("update %s", productInventory);
         ProductInventory existingProduct = ProductInventory.findBySku(sku);
-        if (productInventory == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
         existingProduct.name = productInventory.name;
         existingProduct.category = productInventory.category;
         existingProduct.persist();
