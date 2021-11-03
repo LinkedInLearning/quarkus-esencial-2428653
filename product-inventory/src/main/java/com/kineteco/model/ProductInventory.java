@@ -1,7 +1,8 @@
 package com.kineteco.model;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import io.smallrye.mutiny.Uni;
 
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -22,28 +23,28 @@ public class ProductInventory extends PanacheEntity {
 
    @Null(groups = ValidationGroups.Put.class)
    @NotBlank(groups = ValidationGroups.Post.class)
-   private String sku;
-   private String category;
+   public String sku;
+   public String category;
 
    @NotBlank(message = "Name is mandatory and should be provided")
-   private String name;
+   public String name;
 
-   private int quantity;
-   private String powerWatts;
-   private String footprint;
-   private BigDecimal manufacturingCost;
-   private BigDecimal price;
+   public int quantity;
+   public String powerWatts;
+   public String footprint;
+   public BigDecimal manufacturingCost;
+   public BigDecimal price;
    @Enumerated(EnumType.STRING)
-   private ProductLine productLine;
+   public ProductLine productLine;
 
    @Convert(converter = ConsumerTypeConverter.class)
-   private List<ConsumerType> targetConsumer = new ArrayList<>();
+   public List<ConsumerType> targetConsumer = new ArrayList<>();
 
    @Enumerated(EnumType.STRING)
-   private ProductAvailability productAvailability;
+   public ProductAvailability productAvailability;
 
    @PositiveOrZero
-   private int unitsAvailable;
+   public int unitsAvailable;
 
    public ProductInventory() {
 
@@ -70,20 +71,19 @@ public class ProductInventory extends PanacheEntity {
       this.unitsAvailable = unitsAvailable;
    }
 
-   public static ProductInventory findBySku(String sku) {
+   public static Uni<ProductInventory> findBySku(String sku) {
       return find("sku", sku)
-            .<ProductInventory>firstResultOptional()
-            .orElseThrow(()-> new NotFoundException());
+            .<ProductInventory>firstResult()
+            .onItem().ifNull().failWith(new NotFoundException());
    }
 
-   public static int findCurrentStock(String sku) {
-      UnitsAvailable unitsAvailable = find("sku", sku).project(UnitsAvailable.class).firstResult();
+   public static Uni<Integer> findCurrentStock(String sku) {
+      Uni<UnitsAvailable> unitsAvailable =
+            find("sku", sku).project(UnitsAvailable.class).firstResult();
 
-      if (unitsAvailable == null) {
-         return 0;
-      }
-
-      return unitsAvailable.unitsAvailable;
+      return unitsAvailable
+            .onItem().ifNotNull().transform(e -> e.unitsAvailable)
+            .onItem().ifNull().continueWith(0);
    }
 
    @Override
@@ -115,101 +115,5 @@ public class ProductInventory extends PanacheEntity {
       return Objects
             .hash(sku, category, name, quantity, powerWatts, footprint, manufacturingCost, price, productLine,
                   targetConsumer, productAvailability, unitsAvailable);
-   }
-
-   public String getSku() {
-      return sku;
-   }
-
-   public void setSku(String sku) {
-      this.sku = sku;
-   }
-
-   public String getCategory() {
-      return category;
-   }
-
-   public void setCategory(String category) {
-      this.category = category;
-   }
-
-   public String getName() {
-      return name;
-   }
-
-   public void setName(String name) {
-      this.name = name;
-   }
-
-   public int getQuantity() {
-      return quantity;
-   }
-
-   public void setQuantity(int quantity) {
-      this.quantity = quantity;
-   }
-
-   public String getPowerWatts() {
-      return powerWatts;
-   }
-
-   public void setPowerWatts(String powerWatts) {
-      this.powerWatts = powerWatts;
-   }
-
-   public String getFootprint() {
-      return footprint;
-   }
-
-   public void setFootprint(String footprint) {
-      this.footprint = footprint;
-   }
-
-   public BigDecimal getManufacturingCost() {
-      return manufacturingCost;
-   }
-
-   public void setManufacturingCost(BigDecimal manufacturingCost) {
-      this.manufacturingCost = manufacturingCost;
-   }
-
-   public BigDecimal getPrice() {
-      return price;
-   }
-
-   public void setPrice(BigDecimal price) {
-      this.price = price;
-   }
-
-   public ProductLine getProductLine() {
-      return productLine;
-   }
-
-   public void setProductLine(ProductLine productLine) {
-      this.productLine = productLine;
-   }
-
-   public List<ConsumerType> getTargetConsumer() {
-      return targetConsumer;
-   }
-
-   public void setTargetConsumer(List<ConsumerType> targetConsumer) {
-      this.targetConsumer = targetConsumer;
-   }
-
-   public ProductAvailability getProductAvailability() {
-      return productAvailability;
-   }
-
-   public void setProductAvailability(ProductAvailability productAvailability) {
-      this.productAvailability = productAvailability;
-   }
-
-   public int getUnitsAvailable() {
-      return unitsAvailable;
-   }
-
-   public void setUnitsAvailable(int unitsAvailable) {
-      this.unitsAvailable = unitsAvailable;
    }
 }

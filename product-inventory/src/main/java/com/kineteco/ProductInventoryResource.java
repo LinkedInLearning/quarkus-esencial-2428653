@@ -4,7 +4,8 @@ import com.kineteco.config.ProductInventoryConfig;
 import com.kineteco.model.ProductInventory;
 import com.kineteco.model.ProductLine;
 import com.kineteco.model.ValidationGroups;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.hibernate.reactive.panache.Panache;
+import io.quarkus.hibernate.reactive.panache.PanacheQuery;
 import io.quarkus.panache.common.Sort;
 import io.smallrye.common.annotation.Blocking;
 import io.smallrye.common.annotation.NonBlocking;
@@ -51,84 +52,86 @@ public class ProductInventoryResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Blocking
     public Uni<List<ProductInventory>> listInventory(@QueryParam("page") Integer page, @QueryParam("size") Integer size) {
         LOGGER.debug("Product inventory list");
-        List<ProductInventory> fullInventory;
+        Uni<List<ProductInventory>> fullInventory;
         if (page == null && size == null) {
             fullInventory = ProductInventory.listAll();
         } else {
             PanacheQuery<ProductInventory> query = ProductInventory.findAll(Sort.by("name"));
             fullInventory = query.page(page, size).list();
         }
-        return Uni.createFrom().item(fullInventory);
+        return fullInventory;
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{sku}")
-    public Response inventory(@PathParam("sku") String sku) {
+    public Uni<ProductInventory> inventory(@PathParam("sku") String sku) {
         LOGGER.debugf("get by sku %s", sku);
-        ProductInventory productInventory = ProductInventory.findBySku(sku);
-        return Response.ok(productInventory).build();
+        return ProductInventory.findById(sku);
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{sku}/stock")
-    public Response getStock(@PathParam("sku") String sku, @Context HttpHeaders headers) {
+    public Uni<Integer> getStock(@PathParam("sku") String sku) {
         LOGGER.debugf("getStock by sku %s", sku);
-        LOGGER.debug(headers.getRequestHeaders());
-        return Response.ok(ProductInventory.findCurrentStock(sku)).build();
+        return ProductInventory.findCurrentStock(sku);
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Transactional
-    public Response createProduct(@Valid @ConvertGroup(to = ValidationGroups.Post.class) ProductInventory productInventory) {
+    public Uni<Response> createProduct(@Valid @ConvertGroup(to = ValidationGroups.Post.class) ProductInventory productInventory) {
         LOGGER.debugf("create %s", productInventory);
-        productInventory.persist();
-        return Response.created(URI.create(productInventory.getSku())).build();
+        return Panache.<ProductInventory>withTransaction(productInventory::persist)
+              .onItem().ifNotNull().transform(e -> Response.created(URI.create(productInventory.sku)).build());
     }
 
     @PUT
     @Path("/{sku}")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Transactional
-    public Response updateProduct(@PathParam("sku") String sku, @ConvertGroup(to = ValidationGroups.Put.class)  @Valid ProductInventory productInventory) {
+    public Uni<Response> updateProduct(@PathParam("sku") String sku, @ConvertGroup(to = ValidationGroups.Put.class)  @Valid ProductInventory productInventory) {
+        productInventory.sku = sku;
         LOGGER.debugf("update %s", productInventory);
-        ProductInventory existingProduct = ProductInventory.findBySku(sku);
-        existingProduct.setName(productInventory.getName());
-        existingProduct.setCategory(productInventory.getCategory());
-        existingProduct.persist();
-        return Response.accepted(productInventory).build();
+
+        return Panache.withTransaction(() -> {
+            Uni<ProductInventory> bySku = ProductInventory.findById(productInventory.sku);
+            return bySku.onItem().ifNotNull().invoke(e -> {
+                e.name = productInventory.name;
+                e.category = productInventory.category;
+            });
+        }) .onItem().ifNotNull().transform(e -> Response.accepted(e).build())
+           .onItem().ifNull().continueWith(Response.status(Response.Status.NOT_FOUND).build());
     }
 
     @DELETE
     @Path("/{sku}")
-    @Transactional
-    public Response delete(@PathParam("sku") String sku) {
+    public Uni<Response> delete(@PathParam("sku") String sku) {
         LOGGER.debugf("delete by sku %s", sku);
-        ProductInventory.delete("sku", sku);
-        return Response.accepted().build();
+        return Panache.withTransaction(() -> ProductInventory.deleteById(sku))
+              .map(d -> d ? Response.accepted().build() : Response.status(Response.Status.NOT_FOUND).build());
     }
+
 
     @PATCH
     @Path("/{sku}")
     @Operation(summary = "Update the stock of a product by sku.", description = "Longer description that explains all.")
-    @Transactional
-    public Response updateStock(@PathParam("sku") String sku, @QueryParam("stock") Integer stock) {
-        LOGGER.debugf("get by sku %s", sku);
-        int currentStock = ProductInventory.findCurrentStock(sku);
-        ProductInventory.update("unitsAvailable = ?1 where sku= ?2", currentStock + stock, sku);
-        return Response.accepted(sku).build();
+    public Uni<Response> updateStock(@PathParam("sku") String sku, @QueryParam("stock") Integer stock) {
+        return Panache.withTransaction(() -> {
+            Uni<ProductInventory> bySku = ProductInventory.findById(sku);
+            return bySku.onItem().ifNotNull().invoke(e -> {
+                e.unitsAvailable = e.unitsAvailable + stock;
+            });
+        }) .onItem().ifNotNull().transform(e -> Response.accepted(e).build())
+              .onItem().ifNull().continueWith(Response.status(Response.Status.NOT_FOUND).build());
     }
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/line/{productLine}")
-    public Response productsCount(@PathParam("productLine") ProductLine productLine) {
+    public Uni<Long> productsCount(@PathParam("productLine") ProductLine productLine) {
         LOGGER.debug("Count productLines");
-        return Response.ok(ProductInventory.count("productLine", productLine)).build();
+        return ProductInventory.count("productLine", productLine);
     }
 }
