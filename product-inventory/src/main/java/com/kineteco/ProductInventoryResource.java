@@ -3,6 +3,7 @@ package com.kineteco;
 import com.kineteco.config.ProductInventoryConfig;
 import com.kineteco.model.ProductInventory;
 import com.kineteco.model.ValidationGroups;
+import com.kineteco.repository.ProductInventoryRepository;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.jboss.logging.Logger;
 
@@ -23,12 +24,14 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
 
 @Path("/products")
 public class ProductInventoryResource {
     private static final Logger LOGGER = Logger.getLogger(ProductInventoryResource.class);
+
+    @Inject
+    ProductInventoryRepository productInventoryRepository;
 
     @Inject
     ProductInventoryConfig productInventoryConfig;
@@ -45,7 +48,7 @@ public class ProductInventoryResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Collection<ProductInventory> listInventory() {
         LOGGER.debug("Product inventory list");
-        return ProductInventory.listAll();
+        return productInventoryRepository.listAll();
     }
 
     @GET
@@ -53,7 +56,7 @@ public class ProductInventoryResource {
     @Path("/{sku}")
     public Response inventory(@PathParam("sku") String sku) {
         LOGGER.debugf("get by sku %s", sku);
-        ProductInventory productInventory = ProductInventory.findBySku(sku);
+        ProductInventory productInventory = productInventoryRepository.findBySku(sku);
 
         if (productInventory == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -68,9 +71,9 @@ public class ProductInventoryResource {
     public Response createProduct(@Valid @ConvertGroup(to = ValidationGroups.Post.class) ProductInventory productInventory) {
         LOGGER.debugf("create %s", productInventory);
 
-        productInventory.persist();
+        productInventoryRepository.persist(productInventory);
 
-        return Response.created(URI.create(productInventory.sku)).build();
+        return Response.created(URI.create(productInventory.getSku())).build();
     }
 
     @PUT
@@ -79,14 +82,15 @@ public class ProductInventoryResource {
     @Transactional
     public Response updateProduct(@PathParam("sku") String sku, @ConvertGroup(to = ValidationGroups.Put.class)  @Valid ProductInventory productInventory) {
         LOGGER.debugf("update %s", productInventory);
-        ProductInventory existingProduct = ProductInventory.findBySku(sku);
+        ProductInventory existingProduct = productInventoryRepository.findBySku(sku);
         if (productInventory == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        existingProduct.name = productInventory.name;
-        existingProduct.category = productInventory.category;
-        existingProduct.persist();
+        existingProduct.setName(productInventory.getName());
+        existingProduct.setCategory(productInventory.getCategory());
+        //...
+        productInventoryRepository.persist(existingProduct);
         return Response.accepted(productInventory).build();
     }
 
@@ -96,9 +100,9 @@ public class ProductInventoryResource {
     @Transactional
     public Response updateStock(@PathParam("sku") String sku, @QueryParam("stock") Integer stock) {
         LOGGER.debugf("get by sku %s", sku);
-        int currentStock = ProductInventory.findCurrentStock(sku);
+        int currentStock = productInventoryRepository.findCurrentStock(sku);
 
-        ProductInventory.update("unitsAvailable = ?1 where sku= ?2", currentStock + stock, sku);
+        productInventoryRepository.update("unitsAvailable = ?1 where sku= ?2", currentStock + stock, sku);
 
         return Response.accepted(URI.create(sku)).build();
     }
@@ -108,7 +112,7 @@ public class ProductInventoryResource {
     @Transactional
     public Response delete(@PathParam("sku") String sku) {
         LOGGER.debugf("delete by sku %s", sku);
-        ProductInventory.delete("sku", sku);
+        productInventoryRepository.delete("sku", sku);
         return Response.accepted().build();
     }
 
