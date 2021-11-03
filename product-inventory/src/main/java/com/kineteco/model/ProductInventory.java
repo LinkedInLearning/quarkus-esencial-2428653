@@ -1,6 +1,9 @@
 package com.kineteco.model;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+
 import javax.persistence.Convert;
+import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.NotBlank;
@@ -11,7 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ProductInventory {
+@Entity
+public class ProductInventory extends PanacheEntity {
 
    @Null(groups = ValidationGroups.Put.class)
    @NotBlank(groups = ValidationGroups.Post.class)
@@ -38,6 +42,20 @@ public class ProductInventory {
 
    @PositiveOrZero
    public int unitsAvailable;
+
+   public static ProductInventory findBySku(String sku) {
+      return find("sku", sku).firstResult();
+   }
+
+   public static int findCurrentStock(String sku) {
+      UnitsAvailable unitsAvailable = find("sku", sku).project(UnitsAvailable.class).firstResult();
+
+      if (unitsAvailable == null) {
+         return 0;
+      }
+
+      return unitsAvailable.unitsAvailable;
+   }
 
    @Override
    public String toString() {
