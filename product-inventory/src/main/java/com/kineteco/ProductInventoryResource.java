@@ -2,7 +2,6 @@ package com.kineteco;
 
 import com.kineteco.config.ProductInventoryConfig;
 import com.kineteco.model.ProductInventory;
-import com.kineteco.model.UnitsAvailable;
 import com.kineteco.model.ValidationGroups;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.jboss.logging.Logger;
@@ -24,7 +23,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
 
 @Path("/products")
@@ -69,7 +67,7 @@ public class ProductInventoryResource {
     public Response createProduct(@Valid @ConvertGroup(to = ValidationGroups.Post.class) ProductInventory productInventory) {
         LOGGER.debugf("create %s", productInventory);
         productInventory.persist();
-        return Response.created(URI.create(productInventory.getSku())).build();
+        return Response.created(URI.create(productInventory.sku)).build();
     }
 
     @PUT
@@ -82,8 +80,8 @@ public class ProductInventoryResource {
         if (productInventory == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        existingProduct.setName(productInventory.getName());
-        existingProduct.setCategory(productInventory.getCategory());
+        existingProduct.name = productInventory.name;
+        existingProduct.category = productInventory.category;
         existingProduct.persist();
         return Response.accepted(productInventory).build();
     }
