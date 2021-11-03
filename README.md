@@ -12,8 +12,18 @@ no sea blocking para los clientes.
   ==> 2021-10-10 11:14:05,021 DEBUG [com.kin.ProductInventoryResource] (executor-thread-0) health called
 
 * Cambiamos nuestras dependencias reasteasy por resteasy-reactive (resteasy y jsonb)
+```xml
+   <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-resteasy-reactive</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-resteasy-reactive-jsonb</artifactId>
+    </dependency>
+```
 * Vemos como se descargan, lanzamos los test y todo pasa correctamente.
-    - el log cita vert.x worker thread
+    - el log `(executor-thread-0) health called`
 * Utilizamos la a anotación ```@NonBlocking``` en el método ```health```
 * vemos que funciona y vemos en el log
   ``2021-10-10 11:15:50,136 DEBUG [com.kin.ProductInventoryResource] (vert.x-eventloop-thread-7) health called``

@@ -6,6 +6,9 @@ import com.kineteco.model.ProductLine;
 import com.kineteco.model.ValidationGroups;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Sort;
+import io.smallrye.common.annotation.Blocking;
+import io.smallrye.common.annotation.NonBlocking;
+import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.jboss.logging.Logger;
 
@@ -28,7 +31,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.util.Collection;
+import java.util.List;
 
 @Path("/products")
 public class ProductInventoryResource {
@@ -40,6 +43,7 @@ public class ProductInventoryResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/health")
+    @NonBlocking
     public String health() {
         LOGGER.debug("health called");
         return productInventoryConfig.greetingMessage();
@@ -47,14 +51,17 @@ public class ProductInventoryResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<ProductInventory> listInventory(@QueryParam("page") Integer page, @QueryParam("size") Integer size) {
+    @Blocking
+    public Uni<List<ProductInventory>> listInventory(@QueryParam("page") Integer page, @QueryParam("size") Integer size) {
         LOGGER.debug("Product inventory list");
+        List<ProductInventory> fullInventory;
         if (page == null && size == null) {
-            return ProductInventory.listAll();
+            fullInventory = ProductInventory.listAll();
+        } else {
+            PanacheQuery<ProductInventory> query = ProductInventory.findAll(Sort.by("name"));
+            fullInventory = query.page(page, size).list();
         }
-        PanacheQuery<ProductInventory> query = ProductInventory.findAll(Sort.by("name"));
-        query.page(page, size);
-        return query.list();
+        return Uni.createFrom().item(fullInventory);
     }
 
     @GET
