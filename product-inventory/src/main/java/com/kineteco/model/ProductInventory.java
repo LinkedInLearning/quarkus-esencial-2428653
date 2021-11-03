@@ -1,10 +1,6 @@
 package com.kineteco.model;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import io.quarkus.runtime.annotations.RegisterForReflection;
-
 import javax.persistence.Convert;
-import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.NotBlank;
@@ -15,59 +11,33 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@RegisterForReflection
 public class ProductInventory {
 
    @Null(groups = ValidationGroups.Put.class)
    @NotBlank(groups = ValidationGroups.Post.class)
-   private String sku;
-   private String category;
+   public String sku;
+   public String category;
 
    @NotBlank(message = "Name is mandatory and should be provided")
    private String name;
 
-   private int quantity;
-   private String powerWatts;
-   private String footprint;
-   private BigDecimal manufacturingCost;
-   private BigDecimal price;
+   public int quantity;
+   public String powerWatts;
+   public String footprint;
+   public BigDecimal manufacturingCost;
+   public BigDecimal price;
 
    @Enumerated(EnumType.STRING)
-   private ProductLine productLine;
+   public ProductLine productLine;
 
    @Convert(converter = ConsumerTypeConverter.class)
-   private List<ConsumerType> targetConsumer = new ArrayList<>();
+   public List<ConsumerType> targetConsumer = new ArrayList<>();
 
    @Enumerated(EnumType.STRING)
-   private ProductAvailability productAvailability;
+   public ProductAvailability productAvailability;
 
    @PositiveOrZero
-   private int unitsAvailable;
-
-   public ProductInventory() {
-
-   }
-
-   public ProductInventory(String sku) {
-      this.sku = sku;
-   }
-
-   public ProductInventory(String sku, String category, String name, int quantity, String powerWatts, String footprint,
-                           BigDecimal manufacturingCost, BigDecimal price, ProductLine productLine,
-                           List<ConsumerType> targetConsumer, ProductAvailability productAvailability, int unitsAvailable) {
-      this.sku = sku;
-      this.category = category;
-      this.name = name;
-      this.quantity = quantity;
-      this.powerWatts = powerWatts;
-      this.footprint = footprint;
-      this.manufacturingCost = manufacturingCost;
-      this.price = price;
-      this.productLine = productLine;
-      this.targetConsumer = targetConsumer;
-      this.productAvailability = productAvailability;
-      this.unitsAvailable = unitsAvailable;
-   }
+   public int unitsAvailable;
 
    @Override
    public String toString() {
@@ -98,101 +68,5 @@ public class ProductInventory {
       return Objects
             .hash(sku, category, name, quantity, powerWatts, footprint, manufacturingCost, price, productLine,
                   targetConsumer, productAvailability, unitsAvailable);
-   }
-
-   public String getSku() {
-      return sku;
-   }
-
-   public void setSku(String sku) {
-      this.sku = sku;
-   }
-
-   public String getCategory() {
-      return category;
-   }
-
-   public void setCategory(String category) {
-      this.category = category;
-   }
-
-   public String getName() {
-      return name;
-   }
-
-   public void setName(String name) {
-      this.name = name;
-   }
-
-   public int getQuantity() {
-      return quantity;
-   }
-
-   public void setQuantity(int quantity) {
-      this.quantity = quantity;
-   }
-
-   public String getPowerWatts() {
-      return powerWatts;
-   }
-
-   public void setPowerWatts(String powerWatts) {
-      this.powerWatts = powerWatts;
-   }
-
-   public String getFootprint() {
-      return footprint;
-   }
-
-   public void setFootprint(String footprint) {
-      this.footprint = footprint;
-   }
-
-   public BigDecimal getManufacturingCost() {
-      return manufacturingCost;
-   }
-
-   public void setManufacturingCost(BigDecimal manufacturingCost) {
-      this.manufacturingCost = manufacturingCost;
-   }
-
-   public BigDecimal getPrice() {
-      return price;
-   }
-
-   public void setPrice(BigDecimal price) {
-      this.price = price;
-   }
-
-   public ProductLine getProductLine() {
-      return productLine;
-   }
-
-   public void setProductLine(ProductLine productLine) {
-      this.productLine = productLine;
-   }
-
-   public List<ConsumerType> getTargetConsumer() {
-      return targetConsumer;
-   }
-
-   public void setTargetConsumer(List<ConsumerType> targetConsumer) {
-      this.targetConsumer = targetConsumer;
-   }
-
-   public ProductAvailability getProductAvailability() {
-      return productAvailability;
-   }
-
-   public void setProductAvailability(ProductAvailability productAvailability) {
-      this.productAvailability = productAvailability;
-   }
-
-   public int getUnitsAvailable() {
-      return unitsAvailable;
-   }
-
-   public void setUnitsAvailable(int unitsAvailable) {
-      this.unitsAvailable = unitsAvailable;
    }
 }
