@@ -19,7 +19,7 @@ public class ProductInventory {
    public String category;
 
    @NotBlank(message = "Name is mandatory and should be provided")
-   private String name;
+   public String name;
 
    public int quantity;
    public String powerWatts;

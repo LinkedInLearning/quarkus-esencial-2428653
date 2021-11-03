@@ -66,7 +66,7 @@ public class ProductInventoryResource {
     public Response createProduct(@Valid @ConvertGroup(to = ValidationGroups.Post.class) ProductInventory productInventory) {
         LOGGER.debugf("create %s", productInventory);
 
-        return Response.created(URI.create(productInventory.getSku())).build();
+        return Response.created(URI.create(productInventory.sku)).build();
     }
 
     @PUT
@@ -87,7 +87,7 @@ public class ProductInventoryResource {
         if (productInventory == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        return Response.accepted(URI.create(productInventory.getSku())).build();
+        return Response.accepted(URI.create(productInventory.sku)).build();
     }
 
     @DELETE
