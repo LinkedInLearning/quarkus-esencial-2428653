@@ -1,50 +1,21 @@
 # Quarkus esencial
-## 08_03 API REST Reactiva con Quarkus y RESTEasy Reactive
+## 08_03 Acceso a base de datos reactivo con Hibernate Reactive y Quarkus
 
-Vamos a aprender a convertir el API imperativa a reactiva para obtener todos los beneficios de exponr un API que
-no sea blocking para los clientes.
-
-* arrancamos quarkus en modo desarrollo
+* Añadimos las extensiones necesarias
 ```shell
- ./mvnw quarkus:dev
-```
-* Llamamos a `http localhost:8080/products/health` y miramos los logs
-  ==> 2021-10-10 11:14:05,021 DEBUG [com.kin.ProductInventoryResource] (executor-thread-0) health called
+  ./mvnw quarkus:remove-extension -Dextensions="quarkus-jdbc-postgresql,quarkus-hibernate-orm-panache,quarkus-jdbc-h2"
+  ./mvnw quarkus:add-extension -Dextensions="quarkus-reactive-pg-client,quarkus-hibernate-reactive-panache"
+ ```
 
-* Cambiamos nuestras dependencias reasteasy por resteasy-reactive (resteasy y jsonb)
-```xml
-   <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy-reactive</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy-reactive-jsonb</artifactId>
-    </dependency>
-```
-* Vemos como se descargan, lanzamos los test y todo pasa correctamente.
-    - el log `(executor-thread-0) health called`
-* Utilizamos la a anotación ```@NonBlocking``` en el método ```health```
-* vemos que funciona y vemos en el log
-  ``2021-10-10 11:15:50,136 DEBUG [com.kin.ProductInventoryResource] (vert.x-eventloop-thread-7) health called``
-  Es el loop de eventos de vert.x que ahora coge el mando.
-  La anotación @blocking indicará en un thread worker
-* Para evitar tener que utilizar la anotación @NonBlocking, RestEasy reactivo funciona por defecto
-    - Si un método retorna un objeto, por defecto es el worker thread salvo que pongamos @NonBlocking
-    - Si utilizamos Mutiny, Uni o Multi, como respuesta, se ejecurará en un I/O thread salvo que utilicemos @Blocking
+* Reload maven en intellij e importamos el buen Panache Entity
 
-Cuando delegamos al thread I/O estamos gestionando las peticiones de forma reactiva y incrementando rendimiento de
-nuestro servicio. Para comprobarlo, podemos utilizar herramientas como "wrk".
+* Simplificamos un poco el código de negocio y vamos a ir modificando cada parte poco a poco.
 
-* Convertimos con Uni el listado de productos
-```java
-        Uni<List<ProductInventory>>
+* Primero testListProducts
 
-        Uni.createFrom().item(itemList)
-```
-* Lanzamos los test y vemos que nos indica que estamos usando código blocking en un I/O thread y esto tiene consecuencias
-  de rendimiento. Para ello usamos la anotación `Blocking`.
+* inventoryEndpoint()
 
-El caso es que si nos fijamos bien, el problema es que no es suficiente con utilizar REST Easy reactive y poder utilizar Multi
-o Uni y crear stream de datos.
+* Por último el CRUD. Cambiamos create
+
+En este video hemos aprendido como cambiar un API rest desde el servicio hasta la base de datos utilizando Hibernate y Rest Easy Reactivo.
 
