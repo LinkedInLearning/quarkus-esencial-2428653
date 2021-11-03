@@ -1,11 +1,21 @@
 # Quarkus esencial
-## 05_03 Acceso a base de datos utilizando el patrón Active Record con Quarkus
+## 05_04 Acceso a base de datos utilizando el patrón Data Repository con Quarkus
 
-* Anotamos con `@Entity` ProductInventory
+* Creamos el repositorio
+
+```java
+  @ApplicationScoped
+public class ProductInventoryRepository implements PanacheRepository<ProductInventory>  {
+   private static final Logger LOGGER = Logger.getLogger(ProductInventoryRepository.class);
+
+}
+```
+
+* Anotamos con `@Entity` ProductInventory y añadimos un ID
 ```java
 @Entity
-public class ProductInventory extends PanacheEntity {
-   
+public class ProductInventory {
+   @Id @GeneratedValue private Long id;
 }
 ```  
 * Vamos a indicar que las enumeraciones son String con `@Enumerated(EnumType.STRING)`
@@ -23,48 +33,50 @@ private ProductAvailability productAvailability;
  private List<ConsumerType> targetConsumer = new ArrayList<>();
 ```
 
-* Implementamos listAll
+* Inyectamos ProductInventoryRepository en el ProductInventoryResource
+```java
+@Inject
+ProductInventoryRepository productInventoryRepository;
+```
 
+* Creamos list all
 ```java
 @GET
 @Produces(MediaType.APPLICATION_JSON)
 public Collection<ProductInventory> listInventory() {
     LOGGER.debug("Product inventory list");
-    return ProductInventory.listAll();
+    return productInventoryRepository.listAll();
 }
 ```
-* Implementamos inventory
+
+* Get by sku
+
 ```java
 @GET
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/{sku}")
 public Response inventory(@PathParam("sku") String sku) {
     LOGGER.debugf("get by sku %s", sku);
-    ProductInventory productInventory = ProductInventory.findBySku(sku);
-
-    if (productInventory == null) {
-        return Response.status(Response.Status.NOT_FOUND).build();
-    }
-
+    ProductInventory productInventory = productInventoryRepository.findBySku(sku);
     return Response.ok(productInventory).build();
 }
-    
-ProductInventory.java
-public static ProductInventory findBySku(String sku) {
-   return find("sku", sku).firstResult();
+
+// Repository
+public ProductInventory findBySku(String sku) {
+    LOGGER.debugf("find by sku %s", sku);
+    return find("sku", sku).firstResult();
 }
 ```
-
 * CRUD
-Create
+  Create
 ```java
 @POST
 @Consumes(MediaType.APPLICATION_JSON)
 @Transactional
 public Response createProduct(@Valid @ConvertGroup(to = ValidationGroups.Post.class) ProductInventory productInventory) {
     LOGGER.debugf("create %s", productInventory);
-    productInventory.persist();
-    return Response.created(URI.create(productInventory.sku)).build();
+    productInventoryRepository.persist(productInventory);
+    return Response.created(URI.create(productInventory.getSku())).build();
 }
 ```  
 Update
@@ -74,15 +86,13 @@ Update
 @Consumes(MediaType.APPLICATION_JSON)
 @Transactional
 public Response updateProduct(@PathParam("sku") String sku, @ConvertGroup(to = ValidationGroups.Put.class)  @Valid ProductInventory productInventory) {
-      LOGGER.debugf("update %s", productInventory);
-      ProductInventory existingProduct = ProductInventory.findBySku(sku);
-      if (productInventory == null) {
-      return Response.status(Response.Status.NOT_FOUND).build();
-      }
-      existingProduct.name = productInventory.name;
-      existingProduct.category = productInventory.category;
-      existingProduct.persist();
-      return Response.accepted(productInventory).build();
+    LOGGER.debugf("update %s", productInventory);
+    ProductInventory existingInventory = productInventoryRepository.findBySku(sku);
+    existingInventory.setName(productInventory.getName());
+    existingInventory.setCategory(productInventory.getCategory());
+    //...
+    productInventoryRepository.persist(existingInventory);
+    return Response.accepted(productInventory).build();
 }
 ```
 Delete
@@ -92,9 +102,10 @@ Delete
 @Transactional
 public Response delete(@PathParam("sku") String sku) {
     LOGGER.debugf("delete by sku %s", sku);
-    ProductInventory.delete("sku", sku);
+    productInventoryRepository.delete("sku", sku);
     return Response.accepted().build();
 }
+
 ```
 
 * Update stock
@@ -105,28 +116,20 @@ public Response delete(@PathParam("sku") String sku) {
 @Transactional
 public Response updateStock(@PathParam("sku") String sku, @QueryParam("stock") Integer stock) {
     LOGGER.debugf("get by sku %s", sku);
-    int currentStock = ProductInventory.findCurrentStock(sku);
-    ProductInventory.update("unitsAvailable = ?1 where sku= ?2", currentStock + stock, sku);
-    return Response.accepted(sku).build();
+    int currentStock = productInventoryRepository.getStock(sku);
+    productInventoryRepository.update("unitsAvailable = ?1 where sku= ?2", currentStock + stock, sku);
+    return Response.accepted(URI.create(sku)).build();
 }
 ```
 ProductInventory
 ```java
-public static int findCurrentStock(String sku) {
-  UnitsAvailable unitsAvailable = find("sku", sku).project(UnitsAvailable.class).firstResult();
-
-  if (unitsAvailable == null) {
-     return 0;
-  }
-
-  return unitsAvailable.unitsAvailable;
+public int getStock(String sku) {
+    LOGGER.debugf("get stock sku %s", sku);
+    UnitsAvailable unitsAvailable = find("sku", sku).project(UnitsAvailable.class).firstResult();
+    
+    if (unitsAvailable == null) {
+    return 0;
+    }
+    return unitsAvailable.unitsAvailable;
 }
 ```
-
-Si quisiéramos cortar el acceso a la base de datos para probar los recursos y el api por un lado sin base de datos,
-nos podemos encontrar con el problema de mock con mockito. Pero afortunadamente utilizando la extension quarkus-panache-mock
-podemos desacoplar los tests.
-
-Hemos aprendido como arrancar en modo desarrollo y modo test dos bases de datos sin añadir ninguna configuración, y
-como gracias a un script la base de datos se crea y podemos empezar a focalizarnos en nuestra logica de negocio.
-Comprobamos además como el patron ActiveRecord con Hibernate Panache simplica la ló

@@ -30,8 +30,8 @@ public class ProductInventoryResourceTest {
               .then()
               .statusCode(Response.Status.OK.getStatusCode())
               .extract().body().as(ProductInventory.class);
-        assertThat(domesticProduct.sku).isEqualTo("KE180");
-        assertThat(domesticProduct.targetConsumer).containsExactly(ConsumerType.DOMESTIC);
+        assertThat(domesticProduct.getSku()).isEqualTo("KE180");
+        assertThat(domesticProduct.getTargetConsumer()).containsExactly(ConsumerType.DOMESTIC);
 
         given().when().get("/products/{sku}", "foo")
               .then()
@@ -61,8 +61,8 @@ public class ProductInventoryResourceTest {
               .then()
               .statusCode(Response.Status.OK.getStatusCode()).extract()
               .body().as(ProductInventory.class);
-        assertThat(createdProduct.sku).isEqualTo("123");
-        assertThat(createdProduct.name).isEqualTo("product");
+        assertThat(createdProduct.getSku()).isEqualTo("123");
+        assertThat(createdProduct.getName()).isEqualTo("product");
 
         given()
               .body("{\"name\": \"Super Product\" }")
@@ -77,8 +77,8 @@ public class ProductInventoryResourceTest {
               .statusCode(Response.Status.OK.getStatusCode()).extract()
               .body().as(ProductInventory.class);
 
-        assertThat(updatedProduct.sku).isEqualTo("123");
-        assertThat(updatedProduct.name).isEqualTo("Super Product");
+        assertThat(updatedProduct.getSku()).isEqualTo("123");
+        assertThat(updatedProduct.getName()).isEqualTo("Super Product");
 
         given().when().delete("/products/{sku}", "123")
               .then()
@@ -109,6 +109,6 @@ public class ProductInventoryResourceTest {
               .statusCode(Response.Status.OK.getStatusCode())
               .extract().body().as(ProductInventory.class);
 
-        assertThat(productInventoryAfter.unitsAvailable).isEqualTo(productInventoryPre.unitsAvailable + 3);
+        assertThat(productInventoryAfter.getUnitsAvailable()).isEqualTo(productInventoryPre.getUnitsAvailable() + 3);
     }
 }

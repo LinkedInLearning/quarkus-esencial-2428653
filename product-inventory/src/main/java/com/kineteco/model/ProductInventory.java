@@ -87,4 +87,100 @@ public class ProductInventory extends PanacheEntity {
             .hash(sku, category, name, quantity, powerWatts, footprint, manufacturingCost, price, productLine,
                   targetConsumer, productAvailability, unitsAvailable);
    }
+
+   public String getSku() {
+      return sku;
+   }
+
+   public void setSku(String sku) {
+      this.sku = sku;
+   }
+
+   public String getCategory() {
+      return category;
+   }
+
+   public void setCategory(String category) {
+      this.category = category;
+   }
+
+   public String getName() {
+      return name;
+   }
+
+   public void setName(String name) {
+      this.name = name;
+   }
+
+   public int getQuantity() {
+      return quantity;
+   }
+
+   public void setQuantity(int quantity) {
+      this.quantity = quantity;
+   }
+
+   public String getPowerWatts() {
+      return powerWatts;
+   }
+
+   public void setPowerWatts(String powerWatts) {
+      this.powerWatts = powerWatts;
+   }
+
+   public String getFootprint() {
+      return footprint;
+   }
+
+   public void setFootprint(String footprint) {
+      this.footprint = footprint;
+   }
+
+   public BigDecimal getManufacturingCost() {
+      return manufacturingCost;
+   }
+
+   public void setManufacturingCost(BigDecimal manufacturingCost) {
+      this.manufacturingCost = manufacturingCost;
+   }
+
+   public BigDecimal getPrice() {
+      return price;
+   }
+
+   public void setPrice(BigDecimal price) {
+      this.price = price;
+   }
+
+   public ProductLine getProductLine() {
+      return productLine;
+   }
+
+   public void setProductLine(ProductLine productLine) {
+      this.productLine = productLine;
+   }
+
+   public List<ConsumerType> getTargetConsumer() {
+      return targetConsumer;
+   }
+
+   public void setTargetConsumer(List<ConsumerType> targetConsumer) {
+      this.targetConsumer = targetConsumer;
+   }
+
+   public ProductAvailability getProductAvailability() {
+      return productAvailability;
+   }
+
+   public void setProductAvailability(ProductAvailability productAvailability) {
+      this.productAvailability = productAvailability;
+   }
+
+   public int getUnitsAvailable() {
+      return unitsAvailable;
+   }
+
+   public void setUnitsAvailable(int unitsAvailable) {
+      this.unitsAvailable = unitsAvailable;
+   }
 }
