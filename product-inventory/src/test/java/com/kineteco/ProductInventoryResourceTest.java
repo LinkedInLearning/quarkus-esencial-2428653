@@ -142,6 +142,6 @@ public class ProductInventoryResourceTest {
                     .extract().as(ProductInventory[].class);
 
         assertThat(inventory).hasSize(10);
-//        assertThat(inventory[0].name).isEqualTo("K-Eco 300");
+        assertThat(inventory[0].name).isEqualTo("K-Eco 300");
     }
 }
