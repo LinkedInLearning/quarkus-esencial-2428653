@@ -78,7 +78,7 @@ public class ProductInventoryResourceTest {
               .body().as(ProductInventory.class);
 
         assertThat(updatedProduct.sku).isEqualTo("123");
-        assertThat(updatedProduct.sku).isEqualTo("Super Product");
+        assertThat(updatedProduct.name).isEqualTo("Super Product");
 
         given().when().delete("/products/{sku}", "123")
               .then()
