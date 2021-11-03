@@ -3,6 +3,7 @@ package com.kineteco;
 import com.kineteco.api.Product;
 import com.kineteco.api.ProductInventoryService;
 import com.kineteco.fallbacks.SalesServiceFallbackHandler;
+import org.eclipse.microprofile.faulttolerance.Bulkhead;
 import org.eclipse.microprofile.faulttolerance.CircuitBreaker;
 import org.eclipse.microprofile.faulttolerance.Fallback;
 import org.eclipse.microprofile.faulttolerance.Retry;
@@ -66,6 +67,7 @@ public class SalesResource {
           delayUnit = ChronoUnit.SECONDS
     )
     @Fallback(value = SalesServiceFallbackHandler.class)
+    @Bulkhead(value= 1)
     public Response createDeluxeCommand(CustomerCommand command) {
         Product product = productInventoryService.inventory(command.getSku());
 
