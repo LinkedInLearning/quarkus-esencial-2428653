@@ -48,7 +48,7 @@ public class ProductInventoryResourceTest {
               .body("$.size()", is(53))
               .extract().as(ProductInventory[].class);
         assertThat(inventory).hasSize(53);
-        assertThat(inventory[0].name).isEqualTo("K-Eco 180");
+        assertThat(inventory[0].name).isEqualTo("K-Eco 12-volt Lithium-ion solar backup battery");
     }
 
     @Test
@@ -74,7 +74,7 @@ public class ProductInventoryResourceTest {
               .when()
               .put("/products/{sku}", "123")
               .then()
-              .statusCode(Response.Status.ACCEPTED.getStatusCode());
+              .statusCode(Response.Status.OK.getStatusCode());
 
         ProductInventory updatedProduct = given().when().get("/products/{sku}", "123")
               .then()
@@ -86,7 +86,7 @@ public class ProductInventoryResourceTest {
 
         given().when().delete("/products/{sku}", "123")
               .then()
-              .statusCode(Response.Status.ACCEPTED.getStatusCode());
+              .statusCode(Response.Status.NO_CONTENT.getStatusCode());
 
         given().when().get("/products/{sku}", "123")
               .then()
@@ -151,6 +151,6 @@ public class ProductInventoryResourceTest {
                     .extract().as(ProductInventory[].class);
 
         assertThat(inventory).hasSize(10);
-        assertThat(inventory[0].name).isEqualTo("K-Eco 300");
+        assertThat(inventory[0].name).isEqualTo("K-Eco 325x (same power smaller footprint)");
     }
 }
