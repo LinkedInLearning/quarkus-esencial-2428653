@@ -7,14 +7,13 @@ import com.kineteco.model.ValidationGroups;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.hibernate.reactive.panache.PanacheQuery;
 import io.quarkus.panache.common.Sort;
-import io.smallrye.common.annotation.Blocking;
 import io.smallrye.common.annotation.NonBlocking;
+import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.groups.ConvertGroup;
 import javax.ws.rs.Consumes;
@@ -27,8 +26,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
@@ -52,7 +49,7 @@ public class ProductInventoryResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<List<ProductInventory>> listInventory(@QueryParam("page") Integer page, @QueryParam("size") Integer size) {
+    public Multi<ProductInventory> listInventory(@QueryParam("page") Integer page, @QueryParam("size") Integer size) {
         LOGGER.debug("Product inventory list");
         Uni<List<ProductInventory>> fullInventory;
         if (page == null && size == null) {
@@ -61,7 +58,7 @@ public class ProductInventoryResource {
             PanacheQuery<ProductInventory> query = ProductInventory.findAll(Sort.by("name"));
             fullInventory = query.page(page, size).list();
         }
-        return fullInventory;
+        return ProductInventory.st
     }
 
     @GET
@@ -69,7 +66,7 @@ public class ProductInventoryResource {
     @Path("/{sku}")
     public Uni<ProductInventory> inventory(@PathParam("sku") String sku) {
         LOGGER.debugf("get by sku %s", sku);
-        return ProductInventory.findById(sku);
+        return ProductInventory.findBySku(sku);
     }
 
     @GET
@@ -96,7 +93,7 @@ public class ProductInventoryResource {
         LOGGER.debugf("update %s", productInventory);
 
         return Panache.withTransaction(() -> {
-            Uni<ProductInventory> bySku = ProductInventory.findById(productInventory.sku);
+            Uni<ProductInventory> bySku = ProductInventory.findBySku(productInventory.sku);
             return bySku.onItem().ifNotNull().invoke(e -> {
                 e.name = productInventory.name;
                 e.category = productInventory.category;
@@ -109,8 +106,8 @@ public class ProductInventoryResource {
     @Path("/{sku}")
     public Uni<Response> delete(@PathParam("sku") String sku) {
         LOGGER.debugf("delete by sku %s", sku);
-        return Panache.withTransaction(() -> ProductInventory.deleteById(sku))
-              .map(d -> d ? Response.accepted().build() : Response.status(Response.Status.NOT_FOUND).build());
+        return Panache.withTransaction(() -> ProductInventory.delete("sku", sku))
+              .map(d -> d > 0 ? Response.accepted().build() : Response.status(Response.Status.NOT_FOUND).build());
     }
 
 
@@ -119,7 +116,7 @@ public class ProductInventoryResource {
     @Operation(summary = "Update the stock of a product by sku.", description = "Longer description that explains all.")
     public Uni<Response> updateStock(@PathParam("sku") String sku, @QueryParam("stock") Integer stock) {
         return Panache.withTransaction(() -> {
-            Uni<ProductInventory> bySku = ProductInventory.findById(sku);
+            Uni<ProductInventory> bySku = ProductInventory.findBySku(sku);
             return bySku.onItem().ifNotNull().invoke(e -> {
                 e.unitsAvailable = e.unitsAvailable + stock;
             });
