@@ -1,5 +1,5 @@
 # Quarkus esencial
-## 05_02 Acceso a base de datos utilizando el patrón Active Record con Quarkus
+## 05_03 Acceso a base de datos utilizando el patrón Active Record con Quarkus
 
 En todas las aplicaciones vamos a necesitar antes o después una capa de persistencia de datos, sea en memoria o en disco,
 para poder guardar los datos de forma permanente.
