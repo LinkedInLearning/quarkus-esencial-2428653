@@ -10,4 +10,9 @@ public class ProductOrderStats {
     public ProductOrderStats() {
         this.units = 0;
     }
+
+    public ProductOrderStats(String sku, int units) {
+        this.sku = sku;
+        this.units = units;
+    }
 }

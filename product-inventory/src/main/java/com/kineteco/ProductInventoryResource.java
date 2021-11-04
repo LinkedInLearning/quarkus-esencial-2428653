@@ -45,7 +45,8 @@ public class ProductInventoryResource {
     @Inject
     ProductInventoryConfig productInventoryConfig;
 
-    @Inject ManufactureOrderEmitter manufactureOrderEmitter;
+    @Inject
+    ManufactureOrderEmitter manufactureOrderEmitter;
 
     @GET
     @Produces(TEXT_PLAIN)

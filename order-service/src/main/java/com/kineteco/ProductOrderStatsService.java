@@ -1,13 +1,8 @@
 package com.kineteco;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kineteco.model.ProductOrderStats;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
-import io.smallrye.mutiny.Multi;
-import io.smallrye.mutiny.subscription.Cancellable;
-import io.smallrye.mutiny.unchecked.Unchecked;
-import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -21,19 +16,12 @@ public class ProductOrderStatsService {
    @Inject
    ObjectMapper mapper;
 
-   @Channel("order-stats")
-   Multi<Iterable<ProductOrderStats>> stats;
-
-   private Cancellable cancellable;
-
    public void subscribe(@Observes StartupEvent ev) {
       LOGGER.info("subscribe to order stats");
-      cancellable = stats
-            .map(Unchecked.function(stats -> mapper.writeValueAsString(stats)))
-            .subscribe().with(serialized -> LOGGER.info(serialized));
+
    }
 
    public void cleanup(@Observes ShutdownEvent ev) {
-      cancellable.cancel();
+      LOGGER.info("cancel to order stats");
    }
 }

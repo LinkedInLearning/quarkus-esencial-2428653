@@ -5,6 +5,7 @@ import org.jboss.logging.Logger;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.List;
 
 public class KinetecoProductRanking {
     private static final Logger LOGGER = Logger.getLogger(KinetecoProductRanking.class);
