@@ -26,7 +26,7 @@ public class OrderService {
                   group
                         .onItem().scan(ProductOrderStats::new, this::incrementScore))
             .onItem().transform(productRanking::onNewStat)
-            .invoke(() -> LOGGER.info("Manufacture order received. Stats of top orders computed %s"));
+            .invoke(() -> LOGGER.info("Manufacture order received. Stats of top orders computed"));
    }
 
    private ProductOrderStats incrementScore(ProductOrderStats stats, ManufactureOrder order) {
