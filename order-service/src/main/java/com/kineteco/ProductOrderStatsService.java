@@ -1,27 +1,31 @@
 package com.kineteco;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.quarkus.runtime.ShutdownEvent;
-import io.quarkus.runtime.StartupEvent;
 import org.jboss.logging.Logger;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 
-@ApplicationScoped
+@Path("orders")
 public class ProductOrderStatsService {
    private static final Logger LOGGER = Logger.getLogger(ProductOrderStatsService.class);
 
    @Inject
    ObjectMapper mapper;
 
-   public void subscribe(@Observes StartupEvent ev) {
+
+   @GET
+   @Path("/stats/subscribe")
+   public void subscribe() {
       LOGGER.info("subscribe to order stats");
 
    }
 
-   public void cleanup(@Observes ShutdownEvent ev) {
+   @GET
+   @Path("/stats/unsubscribe")
+   public void cleanup() {
       LOGGER.info("cancel to order stats");
+
    }
 }

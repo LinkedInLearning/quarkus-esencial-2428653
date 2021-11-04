@@ -12,7 +12,7 @@ import javax.enterprise.context.ApplicationScoped;
 public class OrderService {
    private static final Logger LOGGER = Logger.getLogger(OrderService.class);
 
-   private final KinetecoProductRanking productRanking = new KinetecoProductRanking(10);
+   private final KinetecoProductRanking productRanking = new KinetecoProductRanking(3);
 
    /**
     * Multi Productos con las cantidades fabricar
@@ -22,9 +22,18 @@ public class OrderService {
     */
    public Multi<Iterable<ProductOrderStats>> computeProductsStats(Multi<ManufactureOrder> orders) {
       LOGGER.info("orders incoming");
+      return transformManufactureOrderInOrderStats(orders);
+   }
+
+   private Multi<Iterable<ProductOrderStats>> transformManufactureOrderInOrderStats(Multi<ManufactureOrder> orders) {
       return orders
-            .onItem().transform(order -> productRanking.onNewStat(new ProductOrderStats(order.sku, 1)))
-            .invoke(() -> LOGGER.info("Manufacture order received. Stats of top orders computed %s"));
+            .group().by(order -> order.sku)
+            .onItem().transformToMultiAndMerge(group ->
+                  group
+                        .onItem().scan(ProductOrderStats::new, this::incrementScore))
+
+            .onItem().transform(productRanking::onNewStat)
+            .invoke(() -> LOGGER.info("Manufacture order received. Stats of top orders computed"));
    }
 
    private ProductOrderStats incrementScore(ProductOrderStats stats, ManufactureOrder order) {
