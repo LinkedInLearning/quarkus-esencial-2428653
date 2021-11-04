@@ -1,0 +1,19 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: orders
+  labels:
+    strimzi.io/cluster: kineteco-cluster
+spec:
+  partitions: 3
+  replicas: 2
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: order-stats
+  labels:
+    strimzi.io/cluster: kineteco-cluster
+spec:
+  partitions: 3
+  replicas: 2

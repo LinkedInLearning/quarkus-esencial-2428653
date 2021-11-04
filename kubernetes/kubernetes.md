@@ -14,9 +14,25 @@ kubectl delete service product-inventory-service
 kubectl delete deployment product-inventory-service
 kubectl delete service sales-service      
 kubectl delete deployment sales-service
+kubectl delete service order-service      
+kubectl delete deployment order-service
 docker rmi (imageId)
 kubectl delete configmap kineteco
 kubectl delete secret kineteco-credentials
+kubectl delete namespace kafka
+
+# delete all pods
+kubectl delete --all pods --namespace=default
+kubectl delete --all pods --namespace=kafka
+
+
+# delete all deployments
+kubectl delete --all deployments --namespace=default
+kubectl delete --all deployments --namespace=kafka
+ 
+ # delete all services
+kubectl delete --all services --namespace=kafka
+kubectl delete --all services --namespace=kafka
 ```
 
 ## Comandos útiles
