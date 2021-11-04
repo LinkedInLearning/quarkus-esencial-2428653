@@ -103,5 +103,13 @@ public Uni<Response> updateStock(String sku, @RestQuery("stock") Integer stock) 
 }
 ```
 
+* Products count
+
+```java
+public Uni<Long> productsCount(ProductLine productLine) {
+    LOGGER.debug("Count productLines");
+    return ProductInventory.count("productLine", productLine);
+}
+```
 En este video hemos aprendido como cambiar un API rest desde el servicio hasta la base de datos utilizando Hibernate y Rest Easy Reactivo.
 

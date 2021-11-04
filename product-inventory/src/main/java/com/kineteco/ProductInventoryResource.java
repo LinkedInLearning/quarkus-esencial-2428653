@@ -25,6 +25,7 @@ import javax.validation.groups.ConvertGroup;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -99,16 +100,10 @@ public class ProductInventoryResource {
     @POST
     @Consumes(APPLICATION_JSON)
     @APIResponse(responseCode = "201", description = "The URI of the created product", content = @Content(mediaType = APPLICATION_JSON, schema = @Schema(implementation = URI.class)))
-    @ReactiveTransactional
     public Uni<Response> createProduct(@Valid @ConvertGroup(to = ValidationGroups.Post.class) ProductInventory productInventory,
                                        @Context UriInfo uriInfo) {
         LOGGER.debugf("create %s", productInventory);
-       return productInventory.<ProductInventory>persist()
-              .map(p -> {
-                  UriBuilder builder = uriInfo.getAbsolutePathBuilder().path(p.sku);
-                  LOGGER.debugf("New product created with sku %s", p.sku);
-                  return Response.created(builder.build()).build();
-              });
+        throw new NotFoundException();
     }
 
     @Operation(summary = "Updates an product inventory")
@@ -116,18 +111,8 @@ public class ProductInventoryResource {
     @Path("/{sku}")
     @Consumes(APPLICATION_JSON)
     @APIResponse(responseCode = "200", description = "The updated product", content = @Content(mediaType = APPLICATION_JSON, schema = @Schema(implementation = ProductInventory.class)))
-    @ReactiveTransactional
     public Uni<Response> updateProduct(String sku, @ConvertGroup(to = ValidationGroups.Put.class)  @Valid ProductInventory productInventory) {
-        return ProductInventory.findBySku(sku)
-              .map(retrieved -> {
-                  retrieved.name = productInventory.name;
-                  retrieved.category = productInventory.category;
-                  return retrieved;
-              })
-              .map(p -> {
-                  LOGGER.debugf("Product updated with new valued %s", p);
-                  return Response.ok(p).build();
-              });
+        throw new NotFoundException();
     }
 
     @Operation(summary = "Deletes an exiting product inventory")
@@ -135,12 +120,8 @@ public class ProductInventoryResource {
     @Path("/{sku}")
     @APIResponse(responseCode = "204")
     @APIResponse(responseCode = "404", description = "No product")
-    @ReactiveTransactional
     public Uni<Response> delete(String sku) {
-        LOGGER.debugf("delete by sku %s", sku);
-        return ProductInventory.delete("sku", sku)
-              .invoke(() -> LOGGER.debugf("deleted with sku %s", sku))
-              .onItem().transform(d -> d > 0 ?  Response.noContent().build() : Response.status(Response.Status.NOT_FOUND).build());
+        throw new NotFoundException();
     }
 
     @Operation(summary = "Updates the stock of an existing product")
@@ -150,14 +131,8 @@ public class ProductInventoryResource {
     @APIResponse(responseCode = "404", description = "No product")
     @ReactiveTransactional
     public Uni<Response> updateStock(String sku, @RestQuery("stock") Integer stock) {
-        return ProductInventory.findCurrentStock(sku)
-              .onItem().call(currentStock -> {
-                  LOGGER.debugf("update stock for sku %s with current stock %d with %d", sku, currentStock, stock);
-                  return ProductInventory.update("unitsAvailable = ?1 where sku= ?2", currentStock + stock, sku);
-              })
-              .onItem().transform(u -> Response.accepted().build());
+        throw new NotFoundException();
     }
-
 
     @Operation(summary = "Updates the stock of an existing product")
     @GET
@@ -165,7 +140,6 @@ public class ProductInventoryResource {
     @Path("/line/{productLine}")
     @APIResponse(responseCode = "202", description = "The updated product", content = @Content(mediaType = TEXT_PLAIN, schema = @Schema(type = SchemaType.NUMBER )))
     public Uni<Long> productsCount(ProductLine productLine) {
-        LOGGER.debug("Count productLines");
-        return ProductInventory.count("productLine", productLine);
+        throw new NotFoundException();
     }
 }

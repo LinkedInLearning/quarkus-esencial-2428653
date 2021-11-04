@@ -72,18 +72,13 @@ public class ProductInventory extends PanacheEntity {
    }
 
    public static Uni<ProductInventory> findBySku(String sku) {
-      return find("sku", sku)
-            .<ProductInventory>firstResult()
-            .onItem().ifNull().failWith(new NotFoundException());
+      return Uni.createFrom().
+            <ProductInventory>nullItem().onItem().ifNull().failWith(new NotFoundException());
    }
 
    public static Uni<Integer> findCurrentStock(String sku) {
-      Uni<UnitsAvailable> unitsAvailable =
-            find("sku", sku).project(UnitsAvailable.class).firstResult();
-
-      return unitsAvailable
-            .onItem().ifNotNull().transform(e -> e.unitsAvailable)
-            .onItem().ifNull().failWith(() -> new NotFoundException());
+      return Uni.createFrom().
+            <Integer>nullItem().onItem().ifNull().failWith(new NotFoundException());
    }
 
    @Override
