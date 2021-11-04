@@ -124,7 +124,6 @@ public class ProductInventoryResource {
     @Path("/{sku}")
     @APIResponse(responseCode = "202")
     @APIResponse(responseCode = "404", description = "No product")
-    @ReactiveTransactional
     public Uni<Response> updateStock(String sku, @RestQuery("stock") Integer stock) {
         throw new NotFoundException();
     }
