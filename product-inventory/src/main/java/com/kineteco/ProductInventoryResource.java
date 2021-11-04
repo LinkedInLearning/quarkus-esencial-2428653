@@ -36,6 +36,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -65,14 +66,8 @@ public class ProductInventoryResource {
     public Uni<List<ProductInventory>> listInventory(@RestQuery("page") Integer page,
                                                      @RestQuery("size") Integer size) {
         LOGGER.debug("Product inventory list");
-        Uni<List<ProductInventory>> fullInventory;
-        if (page == null && size == null) {
-            fullInventory = ProductInventory.findAll(Sort.by("name")).list();
-        } else {
-            PanacheQuery<ProductInventory> query = ProductInventory.findAll(Sort.by("name"));
-            fullInventory = query.page(page, size).list();
-        }
-        return fullInventory;
+
+        return Uni.createFrom().item(new ArrayList<>());
     }
 
     @Operation(summary = "Returns a product")

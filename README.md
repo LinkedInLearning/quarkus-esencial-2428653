@@ -106,6 +106,7 @@ public Uni<Response> updateStock(String sku, @RestQuery("stock") Integer stock) 
 * Products count
 
 ```java
+@ReactiveTransactional
 public Uni<Long> productsCount(ProductLine productLine) {
     LOGGER.debug("Count productLines");
     return ProductInventory.count("productLine", productLine);
