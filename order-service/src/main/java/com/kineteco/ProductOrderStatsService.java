@@ -24,7 +24,7 @@ public class ProductOrderStatsService {
 
    @GET
    @Path("/stats/unsubscribe")
-   public void cleanup() {
+   public void unsubscribe() {
       LOGGER.info("cancel to order stats");
 
    }
