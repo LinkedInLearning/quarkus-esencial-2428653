@@ -1,4 +1,4 @@
-package com.kineteco.model;
+package com.kineteco;
 
 import io.quarkus.kafka.client.serialization.ObjectMapperDeserializer;
 

@@ -1,34 +1,38 @@
-package io.quarkus.workshop.superheroes.statistics;
+package com.kineteco;
+
+import org.jboss.logging.Logger;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 
-public class Ranking {
+public class KinetecoProductRanking {
+    private static final Logger LOGGER = Logger.getLogger(KinetecoProductRanking.class);
 
     private final int max;
 
-    private final Comparator<Score> comparator = Comparator.comparingInt(s -> -1 * s.score);
+    private final Comparator<ProductOrderStats> comparator = Comparator.comparingInt(s -> -1 * s.units);
 
-    private final LinkedList<Score> top = new LinkedList<>();
+    private final LinkedList<ProductOrderStats> ranking = new LinkedList<>();
 
-    public Ranking(int size) {
+    public KinetecoProductRanking(int size) {
         max = size;
     }
 
-    public Iterable<Score> onNewScore(Score score) {
-        // Remove score if already present,
-        top.removeIf(s -> s.name.equalsIgnoreCase(score.name));
-        // Add the score
-        top.add(score);
+    public Iterable<ProductOrderStats> onNewStat(ProductOrderStats productOrderStats) {
+        LOGGER.debugf("on new stat for product %s", productOrderStats.sku);
+        // Remove stats if already present,
+        ranking.removeIf(s -> s.sku.equalsIgnoreCase(productOrderStats.sku));
+        // Add  stats
+        ranking.add(productOrderStats);
         // Sort
-        top.sort(comparator);
+        ranking.sort(comparator);
 
         // Drop on overflow
-        if (top.size() > max) {
-            top.remove(top.getLast());
+        if (ranking.size() > max) {
+            ranking.remove(ranking.getLast());
         }
 
-        return Collections.unmodifiableList(top);
+        return Collections.unmodifiableList(ranking);
     }
 }

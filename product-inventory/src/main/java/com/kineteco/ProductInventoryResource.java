@@ -4,7 +4,6 @@ import com.kineteco.config.ProductInventoryConfig;
 import com.kineteco.model.ProductInventory;
 import com.kineteco.model.ProductLine;
 import com.kineteco.model.ValidationGroups;
-import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.hibernate.reactive.panache.PanacheQuery;
 import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional;
 import io.quarkus.panache.common.Sort;
@@ -16,7 +15,6 @@ import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.jboss.logging.Logger;
-import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestQuery;
 
 import javax.inject.Inject;
@@ -46,6 +44,8 @@ public class ProductInventoryResource {
 
     @Inject
     ProductInventoryConfig productInventoryConfig;
+
+    @Inject ManufactureOrderEmitter manufactureOrderEmitter;
 
     @GET
     @Produces(TEXT_PLAIN)
@@ -143,7 +143,7 @@ public class ProductInventoryResource {
               .onItem().transform(d -> d > 0 ?  Response.noContent().build() : Response.status(Response.Status.NOT_FOUND).build());
     }
 
-    @Operation(summary = "Updates the stock of an existing product")
+    @Operation(summary = "Updates the stock of an existing product by incrementing or decrementing it.")
     @PATCH
     @Path("/{sku}")
     @APIResponse(responseCode = "202")
@@ -153,7 +153,13 @@ public class ProductInventoryResource {
         return ProductInventory.findCurrentStock(sku)
               .onItem().call(currentStock -> {
                   LOGGER.debugf("update stock for sku %s with current stock %d with %d", sku, currentStock, stock);
-                  return ProductInventory.update("unitsAvailable = ?1 where sku= ?2", currentStock + stock, sku);
+                  int newStock = currentStock + stock;
+                  if (newStock < 0) {
+                      int quantity = newStock*-1;
+                      manufactureOrderEmitter.sendManufactureOrder(sku, quantity);
+                      newStock = 0;
+                  }
+                  return ProductInventory.update("unitsAvailable = ?1 where sku= ?2", newStock, sku);
               })
               .onItem().transform(u -> Response.accepted().build());
     }
