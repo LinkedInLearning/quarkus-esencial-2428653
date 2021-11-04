@@ -1,5 +1,5 @@
-for i in {1..100}
+for sku in KE275 KE180 KE180 KE180 KE325 KE325 KE325 KE325 KI9K KE250 KE250 KE250 KE250 KI9K KE450 KE180 KE180 KI9K KE275 KE275 KE275 KEPATH04 KEPATH04 KE180 KE180 KI9K
 do
-     http post 192.168.99.104:30338/sales customerId=123 sku=KEBL600 units=30
+     http patch localhost:8080/products/$sku?stock=-500
      echo
 done
