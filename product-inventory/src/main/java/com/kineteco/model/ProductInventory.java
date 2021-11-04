@@ -83,7 +83,7 @@ public class ProductInventory extends PanacheEntity {
 
       return unitsAvailable
             .onItem().ifNotNull().transform(e -> e.unitsAvailable)
-            .onItem().ifNull().continueWith(0);
+            .onItem().ifNull().failWith(() -> new NotFoundException());
    }
 
    @Override

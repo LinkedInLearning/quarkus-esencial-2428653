@@ -124,6 +124,14 @@ public class ProductInventoryResourceTest {
     }
 
     @Test
+    public void testUpgradeStockFound() {
+        given().when().queryParam("stock", 3)
+              .patch("/products/{sku}", "foo")
+              .then()
+              .statusCode(Response.Status.NOT_FOUND.getStatusCode());
+    }
+
+    @Test
     public void testCountProductLine() {
         given()
               .when().get("/products/line/{productLine}", ProductLine.DELUXE)

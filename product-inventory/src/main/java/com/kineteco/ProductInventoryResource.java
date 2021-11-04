@@ -29,9 +29,7 @@ import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -63,7 +61,8 @@ public class ProductInventoryResource {
     @Produces(APPLICATION_JSON)
     @APIResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON, schema = @Schema(implementation = ProductInventory.class, type = SchemaType.ARRAY)))
     @APIResponse(responseCode = "204", description = "No products")
-    public Uni<List<ProductInventory>> listInventory(@RestQuery("page") Integer page, @RestQuery("size") Integer size) {
+    public Uni<List<ProductInventory>> listInventory(@RestQuery("page") Integer page,
+                                                     @RestQuery("size") Integer size) {
         LOGGER.debug("Product inventory list");
         Uni<List<ProductInventory>> fullInventory;
         if (page == null && size == null) {
@@ -81,7 +80,7 @@ public class ProductInventoryResource {
     @Path("/{sku}")
     @APIResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON, schema = @Schema(implementation = ProductInventory.class, type = SchemaType.OBJECT)))
     @APIResponse(responseCode = "404", description = "No product")
-    public Uni<ProductInventory> inventory(@RestPath("sku") String sku) {
+    public Uni<ProductInventory> inventory(String sku) {
         LOGGER.debugf("get by sku %s", sku);
         return ProductInventory.findBySku(sku);
     }
@@ -91,7 +90,7 @@ public class ProductInventoryResource {
     @Produces(APPLICATION_JSON)
     @Path("/{sku}/stock")
     @APIResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON, schema = @Schema(type = SchemaType.INTEGER)))
-    public Uni<Integer> getStock(@RestPath("sku") String sku) {
+    public Uni<Integer> getStock(String sku) {
         LOGGER.debugf("getStock by sku %s", sku);
         return ProductInventory.findCurrentStock(sku);
     }
@@ -118,8 +117,7 @@ public class ProductInventoryResource {
     @Consumes(APPLICATION_JSON)
     @APIResponse(responseCode = "200", description = "The updated product", content = @Content(mediaType = APPLICATION_JSON, schema = @Schema(implementation = ProductInventory.class)))
     @ReactiveTransactional
-    public Uni<Response> updateProduct(@RestPath("sku") String sku,
-                                       @ConvertGroup(to = ValidationGroups.Put.class)  @Valid ProductInventory productInventory) {
+    public Uni<Response> updateProduct(String sku, @ConvertGroup(to = ValidationGroups.Put.class)  @Valid ProductInventory productInventory) {
         return ProductInventory.findBySku(sku)
               .map(retrieved -> {
                   retrieved.name = productInventory.name;
@@ -138,7 +136,7 @@ public class ProductInventoryResource {
     @APIResponse(responseCode = "204")
     @APIResponse(responseCode = "404", description = "No product")
     @ReactiveTransactional
-    public Uni<Response> delete(@PathParam("sku") String sku) {
+    public Uni<Response> delete(String sku) {
         LOGGER.debugf("delete by sku %s", sku);
         return ProductInventory.delete("sku", sku)
               .invoke(() -> LOGGER.debugf("deleted with sku %s", sku))
@@ -151,14 +149,13 @@ public class ProductInventoryResource {
     @APIResponse(responseCode = "202")
     @APIResponse(responseCode = "404", description = "No product")
     @ReactiveTransactional
-    public Uni<Response> updateStock(@PathParam("sku") String sku, @QueryParam("stock") Integer stock) {
-        return Panache.withTransaction(() -> {
-            Uni<ProductInventory> bySku = ProductInventory.findBySku(sku);
-            return bySku.onItem().ifNotNull().invoke(e -> {
-                e.unitsAvailable = e.unitsAvailable + stock;
-            });
-        }) .onItem().ifNotNull().transform(e -> Response.accepted(e).build())
-              .onItem().ifNull().continueWith(Response.status(Response.Status.NOT_FOUND).build());
+    public Uni<Response> updateStock(String sku, @RestQuery("stock") Integer stock) {
+        return ProductInventory.findCurrentStock(sku)
+              .onItem().call(currentStock -> {
+                  LOGGER.debugf("update stock for sku %s with current stock %d with %d", sku, currentStock, stock);
+                  return ProductInventory.update("unitsAvailable = ?1 where sku= ?2", currentStock + stock, sku);
+              })
+              .onItem().transform(u -> Response.accepted().build());
     }
 
 
@@ -167,7 +164,7 @@ public class ProductInventoryResource {
     @Produces(TEXT_PLAIN)
     @Path("/line/{productLine}")
     @APIResponse(responseCode = "202", description = "The updated product", content = @Content(mediaType = TEXT_PLAIN, schema = @Schema(type = SchemaType.NUMBER )))
-    public Uni<Long> productsCount(@PathParam("productLine") ProductLine productLine) {
+    public Uni<Long> productsCount(ProductLine productLine) {
         LOGGER.debug("Count productLines");
         return ProductInventory.count("productLine", productLine);
     }
