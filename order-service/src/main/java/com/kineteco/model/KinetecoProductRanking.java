@@ -1,4 +1,4 @@
-package com.kineteco;
+package com.kineteco.model;
 
 import org.jboss.logging.Logger;
 

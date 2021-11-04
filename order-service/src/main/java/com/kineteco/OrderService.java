@@ -1,7 +1,9 @@
 package com.kineteco;
 
+import com.kineteco.model.KinetecoProductRanking;
+import com.kineteco.model.ManufactureOrder;
+import com.kineteco.model.ProductOrderStats;
 import io.smallrye.mutiny.Multi;
-import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.jboss.logging.Logger;
