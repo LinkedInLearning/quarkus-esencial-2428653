@@ -53,46 +53,6 @@ mp.messaging.outgoing.orders.connector=smallrye-kafka
 mp.messaging.outgoing.orders.value.serializer=io.quarkus.kafka.client.serialization.ObjectMapperSerializer
 ```
 
-Order Service
-```java
-package com.kineteco;
-
-import com.kineteco.model.KinetecoProductRanking;
-import com.kineteco.model.ManufactureOrder;
-import com.kineteco.model.ProductOrderStats;
-import io.smallrye.mutiny.Multi;
-import org.eclipse.microprofile.reactive.messaging.Incoming;
-import org.eclipse.microprofile.reactive.messaging.Outgoing;
-import org.jboss.logging.Logger;
-
-import javax.enterprise.context.ApplicationScoped;
-
-@ApplicationScoped
-public class OrderService {
-   private static final Logger LOGGER = Logger.getLogger(OrderService.class);
-
-   private final KinetecoProductRanking productRanking = new KinetecoProductRanking(10);
-
-   @Incoming("orders")
-   @Outgoing("order-stats")
-   public Multi<Iterable<ProductOrderStats>> computeProductsStats(Multi<ManufactureOrder> orders) {
-      LOGGER.info("orders incoming");
-      return orders
-            .group().by(order -> order.sku)
-            .onItem().transformToMultiAndMerge(group ->
-                  group
-                        .onItem().scan(ProductOrderStats::new, this::incrementScore))
-            .onItem().transform(productRanking::onNewStat)
-            .invoke(() -> LOGGER.info("Manufacture order received. Stats of top orders computed %s"));
-   }
-
-   private ProductOrderStats incrementScore(ProductOrderStats stats, ManufactureOrder order) {
-      stats.sku = order.sku;
-      stats.units++;
-      return stats;
-   }
-}
-```
 
 ProductOrderStats
 ```java
@@ -119,16 +79,14 @@ public class ProductOrderStatsService {
    @Inject
    ObjectMapper mapper;
 
-   @Channel("order-stats")
-   Multi<Iterable<ProductOrderStats>> stats;
-
-   private Cancellable cancellable;
+  @Channel("orders")
+  Multi<ManufactureOrder> orders;
 
    public void subscribe(@Observes StartupEvent ev) {
       LOGGER.info("subscribe to order stats");
-      cancellable = stats
-            .map(Unchecked.function(stats -> mapper.writeValueAsString(stats)))
-            .subscribe().with(serialized -> LOGGER.info(serialized));
+      orders
+             .map(Unchecked.function(stats -> mapper.writeValueAsString(stats)))
+             .subscribe().with(serialized -> LOGGER.info(serialized));
    }
 
    public void cleanup(@Observes ShutdownEvent ev) {
