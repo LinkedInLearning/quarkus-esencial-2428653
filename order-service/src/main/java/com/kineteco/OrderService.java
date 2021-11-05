@@ -1,6 +1,10 @@
 package com.kineteco;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kineteco.model.ManufactureOrder;
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.unchecked.Unchecked;
+import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
@@ -14,9 +18,13 @@ public class OrderService {
    @Inject
    ObjectMapper mapper;
 
-   @GET
-   @Path("/stats/subscribe")
-   public void subscribe() {
+   @Channel("orders")
+   Multi<ManufactureOrder> orders;
 
+   @GET
+   @Path("/subscribe")
+   public void subscribe() {
+      orders.map(Unchecked.function(order -> mapper.writeValueAsString(order)))
+            .subscribe().with(serialized -> LOGGER.info(serialized));
    }
 }
