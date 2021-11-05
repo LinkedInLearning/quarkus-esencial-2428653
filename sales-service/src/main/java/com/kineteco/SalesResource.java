@@ -12,6 +12,7 @@ import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
@@ -28,6 +29,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Path("/sales")
+@ApplicationScoped
 public class SalesResource {
 
     private static final Logger LOGGER = Logger.getLogger(SalesResource.class);
