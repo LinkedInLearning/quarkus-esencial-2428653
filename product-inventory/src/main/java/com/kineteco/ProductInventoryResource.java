@@ -9,6 +9,7 @@ import io.quarkus.panache.common.Sort;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.jboss.logging.Logger;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -29,6 +30,7 @@ import java.net.URI;
 import java.util.Collection;
 
 @Path("/products")
+@ApplicationScoped
 public class ProductInventoryResource {
     private static final Logger LOGGER = Logger.getLogger(ProductInventoryResource.class);
 
