@@ -6,6 +6,7 @@ import com.kineteco.model.ValidationGroups;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.jboss.logging.Logger;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.groups.ConvertGroup;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @Path("/products")
+@ApplicationScoped
 public class ProductInventoryResource {
     private static final Logger LOGGER = Logger.getLogger(ProductInventoryResource.class);
 
