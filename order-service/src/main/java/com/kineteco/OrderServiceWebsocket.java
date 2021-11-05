@@ -12,8 +12,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 @Path("orders")
-public class ProductOrderStatsWebsocket {
-   private static final Logger LOGGER = Logger.getLogger(ProductOrderStatsWebsocket.class);
+public class OrderServiceWebsocket {
+   private static final Logger LOGGER = Logger.getLogger(OrderServiceWebsocket.class);
 
    @Inject
    ObjectMapper mapper;
