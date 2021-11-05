@@ -82,12 +82,13 @@ public class ProductOrderStatsService {
   @Channel("orders")
   Multi<ManufactureOrder> orders;
 
-   public void subscribe(@Observes StartupEvent ev) {
-      LOGGER.info("subscribe to order stats");
-      orders
-             .map(Unchecked.function(stats -> mapper.writeValueAsString(stats)))
-             .subscribe().with(serialized -> LOGGER.info(serialized));
-   }
+  @GET
+  @Path("/stats/subscribe")
+  public void subscribe() {
+    orders
+            .map(Unchecked.function(order -> mapper.writeValueAsString(order)))
+            .subscribe().with(serialized -> LOGGER.info(serialized));
+  }
 
    public void cleanup(@Observes ShutdownEvent ev) {
       cancellable.cancel();
@@ -98,6 +99,5 @@ public class ProductOrderStatsService {
 Properties
 ```properties
 mp.messaging.incoming.orders.connector=smallrye-kafka
-mp.messaging.incoming.orders.auto.offset.reset=earliest
 mp.messaging.incoming.orders.value.deserializer=com.kineteco.model.ManufactureOrderDeserializer
 ```
