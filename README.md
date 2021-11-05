@@ -9,19 +9,19 @@
 * Websocket
 ```java
 @ApplicationScoped
-@ServerEndpoint("/stats/orders")
+@ServerEndpoint("/orders")
 public class ProductOrderStatsWebsocket {
    private static final Logger LOGGER = Logger.getLogger(ProductOrderStatsWebsocket.class);
 
    @Inject
    ObjectMapper mapper;
 
-   @Channel("order-stats")
-   Multi<Iterable<ProductOrderStats>> stats;
-
-   private Cancellable cancellable;
+   @Channel("orders")
+   Multi<ManufactureOrder> orders;
 
    private final List<Session> sessions = new CopyOnWriteArrayList<>();
+
+   private Cancellable cancellable;
 
    @OnOpen
    public void onOpen(Session session) {
@@ -37,9 +37,8 @@ public class ProductOrderStatsWebsocket {
 
    @PostConstruct
    public void subscribe() {
-      LOGGER.info("subscribe to order stats");
-      cancellable = stats
-            .map(Unchecked.function(scores -> mapper.writeValueAsString(scores)))
+      cancellable = orders
+            .map(Unchecked.function(order -> mapper.writeValueAsString(order)))
             .subscribe().with(serialized -> sessions.forEach(session -> write(session, serialized)));
    }
 

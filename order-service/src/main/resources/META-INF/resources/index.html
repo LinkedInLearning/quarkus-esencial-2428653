@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Product Order Stats</title>
+    <title>Product Order Orders</title>
 
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly-additions.min.css">
@@ -25,7 +25,7 @@
 <body>
 <div class="container">
 <div class="row">
-    <div class="col"><h1 class="page-title">Kineteco :: Order Stats</h1></div>
+    <div class="col"><h1 class="page-title">Kineteco :: Orders Service</h1></div>
 </div>
 </div>
 <div class="container container-cards-pf">
@@ -33,10 +33,10 @@
         <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
             <div class="card-pf card-pf-view card-pf-view-select">
                 <h2 class="card-pf-title">
-                    <i class="fa fa-trophy"></i> Kineteco Manufacture Order
+                    <i class="fa fa-list"></i> Manufacture Orders
                 </h2>
                 <div class="card-pf-body">
-                    <div id="stats">
+                    <div id="orders">
 
                     </div>
                 </div>
@@ -54,18 +54,16 @@
     $(document).ready(function() {
         var host = window.location.host;
 
-        var top = new WebSocket("ws://" + host + "/stats/orders");
+        var top = new WebSocket("ws://" + host + "/orders");
         top.onmessage = function (event) {
             updateProductStats(event.data);
         };
     });
 
 
-    function updateProductStats(stats) {
-        $("#stats").children("p").remove();
-        JSON.parse(stats).forEach(function(stat) {
-            $("#stats").append($("<p>" + stat.sku + " [" + stat.units + "]</p>"))
-        });
+    function updateProductStats(order) {
+        var jsonOrder = JSON.parse(order);
+        $("#orders").append($("<p>" + jsonOrder.sku + " [" + jsonOrder.quantity + "]</p>"))
     }
 
 </script>
