@@ -56,12 +56,12 @@
 
         var top = new WebSocket("ws://" + host + "/orders");
         top.onmessage = function (event) {
-            updateProductStats(event.data);
+            updateManufactureOrderList(event.data);
         };
     });
 
 
-    function updateProductStats(order) {
+    function updateManufactureOrderList(order) {
         var jsonOrder = JSON.parse(order);
         $("#orders").append($("<p>" + jsonOrder.sku + " [" + jsonOrder.quantity + "]</p>"))
     }
