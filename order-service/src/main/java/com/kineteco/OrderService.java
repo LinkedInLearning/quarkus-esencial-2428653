@@ -4,8 +4,6 @@ import com.kineteco.model.KinetecoProductRanking;
 import com.kineteco.model.ManufactureOrder;
 import com.kineteco.model.ProductOrderStats;
 import io.smallrye.mutiny.Multi;
-import org.eclipse.microprofile.reactive.messaging.Incoming;
-import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -16,10 +14,12 @@ public class OrderService {
 
    private final KinetecoProductRanking productRanking = new KinetecoProductRanking(10);
 
-   @Incoming("orders")
-   @Outgoing("order-stats")
    public Multi<Iterable<ProductOrderStats>> computeProductsStats(Multi<ManufactureOrder> orders) {
       LOGGER.info("orders incoming");
+      return transformToStats(orders);
+   }
+
+   private Multi<Iterable<ProductOrderStats>> transformToStats(Multi<ManufactureOrder> orders) {
       return orders
             .group().by(order -> order.sku)
             .onItem().transformToMultiAndMerge(group ->
@@ -31,7 +31,7 @@ public class OrderService {
 
    private ProductOrderStats incrementScore(ProductOrderStats stats, ManufactureOrder order) {
       stats.sku = order.sku;
-      stats.units++;
+      stats.orderCount++;
       return stats;
    }
 }

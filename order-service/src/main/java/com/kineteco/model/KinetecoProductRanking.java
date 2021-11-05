@@ -11,7 +11,7 @@ public class KinetecoProductRanking {
 
     private final int max;
 
-    private final Comparator<ProductOrderStats> comparator = Comparator.comparingInt(s -> -1 * s.units);
+    private final Comparator<ProductOrderStats> comparator = Comparator.comparingInt(s -> -1 * s.orderCount);
 
     private final LinkedList<ProductOrderStats> ranking = new LinkedList<>();
 

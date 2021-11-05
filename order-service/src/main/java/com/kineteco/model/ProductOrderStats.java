@@ -5,9 +5,9 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 @RegisterForReflection
 public class ProductOrderStats {
     public String sku;
-    public int units;
+    public int orderCount;
 
     public ProductOrderStats() {
-        this.units = 0;
+        this.orderCount = 0;
     }
 }
