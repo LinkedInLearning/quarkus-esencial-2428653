@@ -47,14 +47,14 @@ public class PingProductInventoryResourceHealthCheck implements HealthCheck {
 public class ProductInventoryResourceHealthCheck implements HealthCheck {
    @Inject
    @RestClient
-   ProductInventoryClient productInventoryClient;
+   ProductInventoryServiceClient productInventoryServiceClient;
 
    @Override
    public HealthCheckResponse call() {
       long size = 0;
 
       try {
-         size = productInventoryService.size();
+         size = productInventoryServiceClient.size();
       } catch (WebApplicationException ex) {
          if (ex.getResponse().getStatus() >= 500) {
             return HealthCheckResponse.named("ProductInventoryServiceCheck")

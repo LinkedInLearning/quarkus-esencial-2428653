@@ -1,4 +1,4 @@
-package com.kineteco.api;
+package com.kineteco.client;
 
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
@@ -15,7 +15,7 @@ import javax.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 @ClientHeaderParam(name = "caller-header", value = "sales-service")
 @RegisterClientHeaders
-public interface ProductInventoryService {
+public interface ProductInventoryServiceClient {
 
    @GET
    @Path("/{sku}/stock")

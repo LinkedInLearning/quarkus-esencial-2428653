@@ -1,4 +1,4 @@
-package com.kineteco.api;
+package com.kineteco.client;
 
 import java.util.Objects;
 
