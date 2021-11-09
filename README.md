@@ -1,6 +1,10 @@
 # Quarkus esencial
 ## 08_08 Despliegue en Kubernetes de Quarkus y Apache Kafka
 
+* Arrancamos minikube 
+  
+* Nos aseguramos que tenemos la base de datos Postgresql
+  
 * Desplegamos un Kafka en minikube
 
 ```shell
@@ -18,19 +22,24 @@ kubectl apply -f kafka_topics.yml -n kafka
 
 ```
 
-* Configuramos la conexion en los properties de PI y OS
+* Configuramos el acceso a base de datos reactiva en PI
+```properties
+%prod.quarkus.datasource.reactive.url=postgresql://postgres.default:5432/kineteco
+```
+  
+* Configuramos la conexión en los properties de Product Inventory y Order Service
 ```properties
 %prod.kafka.bootstrap.servers=kineteco-cluster-kafka-bootstrap.kafka:9092
 ```
 
-* Desplegamos PI y OS
+* Desplegamos Product Inventory y Order Service
 ```shell
  ./mvnw package -Dquarkus.kubernetes.deploy=true -DskipTests=true
 ```
 
 * Modificamos `runStockUpgrade`
 
-* check kafka
+* Monitor kafka
 ```shell
 kubectl -n kafka run kafka-consumer -it \
   --image=quay.io/strimzi/kafka:0.25.0-kafka-2.8.0 \
