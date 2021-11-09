@@ -1,5 +1,6 @@
+export PRODUCT_INVENTORY=$(minikube service --url product-inventory-service)
 for sku in KE275 KE180 KE180 KE180 KE325 KE325 KE325 KE325 KI9K KE250 KE250 KE250 KE250 KI9K KE450 KE180 KE180 KI9K KE275 KE275 KE275 KEPATH04 KEPATH04 KE180 KE180 KI9K
 do
-     http patch 192.168.99.104:30727/products/$sku?stock=-500
+     http patch $PRODUCT_INVENTORY/products/$sku?stock=-500
      echo
 done

@@ -31,13 +31,14 @@ kubectl delete --all deployments --namespace=default
 kubectl delete --all deployments --namespace=kafka
  
  # delete all services
-kubectl delete --all services --namespace=kafka
+kubectl delete --all services --namespace=default
 kubectl delete --all services --namespace=kafka
 ```
 
 ## Comandos útiles
 
 ```shell
+kubectl create secret generic kineteco-credentials --from-literal=username=kineteco --from-literal=password=kineteco
 kubectl get configmaps
 kubectl get configmaps kineteco -o yaml     
 kubectl get secrets
