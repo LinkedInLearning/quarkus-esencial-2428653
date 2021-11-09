@@ -1,27 +1,76 @@
 # Quarkus esencial
-## 08_08 Añadir chequeo de salud (Health Check) con el estándar Microprofile y Quarkus
+## 09_03 Implementar chequeos de salud con Quarkus
 
-* Arrancamos minikube y tenemos todo instalado
-
-* Añadimos extension `smallrye-health` en Product Inventory
+* Añadimos extension `smallrye-health` en Sales Service y desplegamos en kubernetes
 ```shell
 ./mvnw quarkus:add-extension -Dextensions="smallrye-health"
-```
-* Desplegamos en kube de nuevo
-```shell
 ./mvnw clean package -Dquarkus.kubernetes.deploy=true -DskipTests=true 
+export SALES_SERVICE=$(minikube service --url sales-service)
 ```
+* Si hacemos un scale down de Product Inventory, sales sigue bien. Arrancamos Sales service en modo desarrollo.
 
-* Exportamos la URL de minikube
-```properties
-export PRODUCT_INVENTORY=$(minikube service --url product-inventory-service) 
-```
+* Abrimos el dev ui
 
-* Probamos los endpoint de salud
+* Comprobamos en linea de comandos los endpoints
 ```shell
-http $PRODUCT_INVENTORY/q/health
-http $PRODUCT_INVENTORY/q/health/live
-http $PRODUCT_INVENTORY/q/health/ready
+http localhost:8080/q/health/live #Product Inventory está up and running
+http localhost:8080/q/health/ready #Product inventory está preparada para aceptar peticiones
+http localhost:8080/q/health #Acumula todos los check de salud de Product Inventory
+http localhost:8080/q/health-ui  #Interfaz gráfica con todos los checks.
+```
+* Todos los endpoint retornan JSON con dos campos
+
+- `status` resultado global de todos los checkeos de salud
+- `checks` un array con cada resultado específico
+
+* Añadimos un check Liveness. No olvidar de mencionar @ApplicationScope de ProductResource
+  Si no añadimos ApplicationScoped el scope por defecto es @Singleton
+```java
+@Liveness
+@ApplicationScoped
+public class PingProductInventoryResourceHealthCheck implements HealthCheck {
+   @Inject
+   ProductInventoryResource productInventoryResource;
+
+   @Override
+   public HealthCheckResponse call() {
+      String response = productInventoryResource.health();
+      return HealthCheckResponse.named("Ping Product Inventory Service")
+            .withData("Response", response).up().build();
+   }
+}
+```
+* Readiness Sales service
+```java
+@Readiness
+@ApplicationScoped
+public class ProductInventoryResourceHealthCheck implements HealthCheck {
+   @Inject
+   @RestClient
+   ProductInventoryClient productInventoryClient;
+
+   @Override
+   public HealthCheckResponse call() {
+      long size = 0;
+
+      try {
+         size = productInventoryService.size();
+      } catch (WebApplicationException ex) {
+         if (ex.getResponse().getStatus() >= 500) {
+            return HealthCheckResponse.named("ProductInventoryServiceCheck")
+                  .withData("exception", ex.getMessage())
+                  .down()
+                  .build();
+         }
+      }
+      return HealthCheckResponse
+            .named("ProductInventoryServiceCheck")
+            .withData("size", size)
+            .up()
+            .build();
+   }
+}
 ```
 
-Podemos probar como escalar up y down la base de datos por ejemplo.
+* Probamos en kubernetes. La extension ya nos ha añadido lo necesario para kubernetes con propiedades que
+  podremos configurar. Empezar con los valores por defecto y luego ir a prueba error
