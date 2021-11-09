@@ -1,51 +1,27 @@
 # Quarkus esencial
-## 08_08 Despliegue en Kubernetes de Quarkus y Apache Kafka
+## 08_08 Añadir chequeo de salud (Health Check) con el estándar Microprofile y Quarkus
 
-* Arrancamos minikube 
-  
-* Nos aseguramos que tenemos la base de datos Postgresql
-  
-* Desplegamos un Kafka en minikube
+* Arrancamos minikube y tenemos todo instalado
 
+* Añadimos extension `smallrye-health` en Product Inventory
 ```shell
-kubectl create namespace kafka
-# creamos el operador
-kubectl apply -f 'strimzi-cluster-operator-0.25.0.yaml' -n kafka
-#creamos el cluster
-kubectl apply -f kafka_cluster.yml -n kafka
-
-#Esperamos kafka 
-kubectl wait kafka/kineteco-cluster --for=condition=Ready --timeout=300s -n kafka
-
-# Creamos los topics
-kubectl apply -f kafka_topics.yml -n kafka
-
+./mvnw quarkus:add-extension -Dextensions="smallrye-health"
+```
+* Desplegamos en kube de nuevo
+```shell
+./mvnw clean package -Dquarkus.kubernetes.deploy=true -DskipTests=true 
 ```
 
-* Configuramos el acceso a base de datos reactiva en PI
+* Exportamos la URL de minikube
 ```properties
-%prod.quarkus.datasource.reactive.url=postgresql://postgres.default:5432/kineteco
-```
-  
-* Configuramos la conexión en los properties de Product Inventory y Order Service
-```properties
-%prod.kafka.bootstrap.servers=kineteco-cluster-kafka-bootstrap.kafka:9092
+export PRODUCT_INVENTORY=$(minikube service --url product-inventory-service) 
 ```
 
-* Desplegamos Product Inventory y Order Service
+* Probamos los endpoint de salud
 ```shell
- ./mvnw package -Dquarkus.kubernetes.deploy=true -DskipTests=true
+http $PRODUCT_INVENTORY/q/health
+http $PRODUCT_INVENTORY/q/health/live
+http $PRODUCT_INVENTORY/q/health/ready
 ```
 
-* Modificamos `runStockUpgrade`
-
-* Monitor kafka
-```shell
-kubectl -n kafka run kafka-consumer -it \
-  --image=quay.io/strimzi/kafka:0.25.0-kafka-2.8.0 \
-  --rm=true --restart=Never \
-  -- bin/kafka-console-consumer.sh \
-  --bootstrap-server kineteco-cluster-kafka-bootstrap.kafka:9092 \
-  --topic orders \
-  --from-beginning
-```
+Podemos probar como escalar up y down la base de datos por ejemplo.
