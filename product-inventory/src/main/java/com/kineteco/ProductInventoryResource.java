@@ -77,32 +77,24 @@ public class ProductInventoryResource {
 
     @POST
     @Consumes(APPLICATION_JSON)
-    public Response createProduct(@Context UriInfo uriInfo, @Valid @ConvertGroup(to = ValidationGroups.Post.class) ProductInventory productInventory) {
+    public Response createProduct(@Valid @ConvertGroup(to = ValidationGroups.Post.class) ProductInventory productInventory) {
         LOGGER.debugf("create %s", productInventory);
         productInventoryService.addProductInventory(productInventory);
-        UriBuilder builder = uriInfo.getAbsolutePathBuilder().path(productInventory.getSku());
-        return Response.created(builder.build()).build();
+        return Response.created(URI.create(productInventory.getSku())).build();
     }
 
-    @Operation(summary = "Updates an product inventory")
-    @APIResponse(responseCode = "200", description = "The updated product", content = @Content(mediaType = APPLICATION_JSON, schema = @Schema(implementation = ProductInventory.class)))
-    @APIResponse(responseCode = "404", description = "No product")
     @PUT
     @Path("/{sku}")
     @Consumes(APPLICATION_JSON)
     public Response updateProduct(@PathParam("sku") String sku, @ConvertGroup(to = ValidationGroups.Put.class)  @Valid ProductInventory productInventory) {
         LOGGER.debugf("update %s", productInventory);
-        ProductInventory updated = productInventoryService.updateProductInventory(sku, productInventory);
-        if (updated == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        return Response.ok(productInventory).build();
+        productInventoryService.updateProductInventory(sku, productInventory);
+        return Response.ok(sku).build();
     }
 
     @PATCH
     @Path("/{sku}")
     @Operation(summary = "Update the stock of a product by sku.", description = "Longer description that explains all.")
-    @APIResponse(responseCode = "202", content = @Content(mediaType = APPLICATION_JSON, schema = @Schema(type = SchemaType.STRING)))
     public Response updateStock(@PathParam("sku") String sku, @QueryParam("stock") Integer stock) {
         LOGGER.debugf("get by sku %s", sku);
         ProductInventory productInventory = productInventoryService.stockUpdate(sku, stock);
