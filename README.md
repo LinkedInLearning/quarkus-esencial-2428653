@@ -28,14 +28,14 @@ http localhost:8080/q/health-ui  #Interfaz gráfica con todos los checks.
 ```java
 @Liveness
 @ApplicationScoped
-public class PingProductInventoryResourceHealthCheck implements HealthCheck {
+public class PingSalesResourceHealthCheck implements HealthCheck {
    @Inject
-   ProductInventoryResource productInventoryResource;
+   SalesResource salesResource;
 
    @Override
    public HealthCheckResponse call() {
-      String response = productInventoryResource.health();
-      return HealthCheckResponse.named("Ping Product Inventory Service")
+      String response = salesResource.health();
+      return HealthCheckResponse.named("Ping Sales Service")
             .withData("Response", response).up().build();
    }
 }
