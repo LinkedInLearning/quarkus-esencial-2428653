@@ -1,8 +1,14 @@
 package com.kineteco;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+
 public class CustomerCommand {
+   @NotNull
    private String customerId;
+   @NotNull
    private String sku;
+   @Positive
    private Integer units;
 
    public String getCustomerId() {

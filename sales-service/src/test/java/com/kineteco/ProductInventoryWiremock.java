@@ -26,6 +26,7 @@ public class ProductInventoryWiremock implements QuarkusTestResourceLifecycleMan
       stubRetry();
       stubFallback();
       stubCircuitBreaker();
+      stubSecured();
       return Collections.singletonMap("kineteco-product-inventory/mp-rest/url", wireMockServer.baseUrl());
    }
 
@@ -132,6 +133,14 @@ public class ProductInventoryWiremock implements QuarkusTestResourceLifecycleMan
             .willReturn(aResponse()
                   .withHeader("Content-Type", "application/json")
                   .withBody("{\"sku\": \"circuitBreaker\", \"productLine\": \"DELUXE\"}")
+            ));
+   }
+
+   static void stubSecured() {
+      stubFor(get(urlEqualTo("/products/secured"))
+            .willReturn(aResponse()
+                  .withHeader("Content-Type", "application/json")
+                  .withBody("{\"sku\": \"secured\", \"productLine\": \"DELUXE\"}")
             ));
    }
 

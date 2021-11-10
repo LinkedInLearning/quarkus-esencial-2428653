@@ -11,9 +11,11 @@ import org.eclipse.microprofile.faulttolerance.Timeout;
 import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
+import org.jboss.resteasy.api.validation.ResteasyViolationException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -67,9 +69,9 @@ public class SalesResource {
           delay = 1,
           delayUnit = ChronoUnit.SECONDS
     )
-    @Fallback(value = SalesServiceFallbackHandler.class)
+    @Fallback(value = SalesServiceFallbackHandler.class, skipOn = ResteasyViolationException.class)
     @Bulkhead(value= 1)
-    public Response createDeluxeCommand(CustomerCommand command) {
+    public Response createDeluxeCommand(@Valid CustomerCommand command) {
         Product product = productInventoryServiceClient.inventory(command.getSku());
 
         if ("DELUXE".equals(product.getProductLine())) {
@@ -81,6 +83,14 @@ public class SalesResource {
         }
 
         return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/secured")
+    public Response createSecuredDeluxeCommand(CustomerCommand command) {
+        return createDeluxeCommand(command);
     }
 
 }
