@@ -25,4 +25,8 @@ public interface ProductInventoryServiceClient {
    @GET
    @Path("/{sku}")
    Product inventory(@PathParam("sku") String sku);
+
+   @GET
+   @Path("/size")
+   Long size();
 }

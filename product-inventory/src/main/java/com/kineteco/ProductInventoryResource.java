@@ -167,13 +167,22 @@ public class ProductInventoryResource {
     }
 
 
-    @Operation(summary = "Updates the stock of an existing product")
+    @Operation(summary = "Size of the catalog by product line")
     @GET
     @Produces(TEXT_PLAIN)
     @Path("/line/{productLine}")
-    @APIResponse(responseCode = "202", description = "The updated product", content = @Content(mediaType = TEXT_PLAIN, schema = @Schema(type = SchemaType.NUMBER )))
+    @APIResponse(responseCode = "200", description = "The size", content = @Content(mediaType = TEXT_PLAIN, schema = @Schema(type = SchemaType.NUMBER )))
     public Uni<Long> productsCount(ProductLine productLine) {
         LOGGER.debug("Count productLines");
         return ProductInventory.count("productLine", productLine);
+    }
+
+    @Operation(summary = "Size of the catalog")
+    @GET
+    @Produces(APPLICATION_JSON)
+    @Path("/size")
+    @APIResponse(responseCode = "200", description = "The size of the inventory", content = @Content(mediaType = TEXT_PLAIN, schema = @Schema(type = SchemaType.NUMBER )))
+    public Uni<Long> size() {
+        return ProductInventory.count();
     }
 }
