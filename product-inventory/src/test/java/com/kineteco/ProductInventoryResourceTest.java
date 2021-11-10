@@ -72,7 +72,7 @@ public class ProductInventoryResourceTest {
               .when()
               .put("/products/{sku}", "123")
               .then()
-              .statusCode(Response.Status.ACCEPTED.getStatusCode());
+              .statusCode(Response.Status.OK.getStatusCode());
 
         ProductInventory updatedProduct = given().when().get("/products/{sku}", "123")
               .then()

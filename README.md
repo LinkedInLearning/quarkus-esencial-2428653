@@ -1,42 +1,49 @@
 # Quarkus esencial
-## 04_04 Documentar el API REST con OpenAPI y Swagger
+## 04_05 Consideraciones adicionales para un API REST
 
-Intro en power point!!!
-
-* Añadimos la extension openapi
-```shell
-./mvnw quarkus:add-extension -Dextensions="quarkus-smallrye-openapi"  
+* Scope of REST API. Dependent por defecto
+```java
+@ApplicationScoped
 ```
 
-* Lanzamos quarkus and vamos a la dev console. Explore Open API and Swagger
-```shell
-h
-d
+* URI creation. De momento usamos @Context para poder inyectar diferentes contextos utiles.
+En el momento de la grabacion usamos context, pero CDI está planteando un cambio para usar otra
+  en el futuro próximo.
+```java
+@POST
+@Consumes(MediaType.APPLICATION_JSON)
+public Response createProduct(@Context UriInfo uriInfo, @Valid @ConvertGroup(to = ValidationGroups.Post.class) ProductInventory productInventory) {
+  LOGGER.debugf("create %s", productInventory);
+  productInventoryService.addProductInventory(productInventory);
+  UriBuilder builder = uriInfo.getAbsolutePathBuilder().path(productInventory.getSku());
+  return Response.created(builder.build()).build();
+}
 ```
-
-
-* Añadimos cambios documentales con anotaciones en el código de forma que el código vive al mismo que tiempo que
-  la documentación
-
-* Añadimos documentación de ejemplo en patch
+  
+* Open API, no olvidar de documentar correctamente @APIResponse
 ```java
-@Operation(summary = "Update the stock of a product by sku.", description = "Longer description that explains all.")
-```  
-
-* Para cambiar la cabecera tebemos que crear una applicacion
-
-```java
- @OpenAPIDefinition(tags = {
-        @Tag(name = "inventory", description = "Operations handling products inventory.")
-}, info =
-@Info(title = "Product Inventory Service", version = "1.0", description = "Operations handling Products Inventory.")
-)
-public class ProductInventoryServiceApp extends Application {
+@APIResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON, schema = @Schema(implementation = ProductInventory.class, type = SchemaType.ARRAY)))
+@Operation(summary = "Updates an product inventory")
+@APIResponse(responseCode = "200", description = "The updated product", content = @Content(mediaType = APPLICATION_JSON, schema = @Schema(implementation = ProductInventory.class)))
+@APIResponse(responseCode = "404", description = "No product")
+@PUT
+@Path("/{sku}")
+@Consumes(APPLICATION_JSON)
+public Response updateProduct(@PathParam("sku") String sku, @ConvertGroup(to = ValidationGroups.Put.class)  @Valid ProductInventory productInventory) {
+  LOGGER.debugf("update %s", productInventory);
+  ProductInventory updated = productInventoryService.updateProductInventory(sku, productInventory);
+  if (updated == null) {
+  return Response.status(Response.Status.NOT_FOUND).build();
+  }
+  return Response.ok(productInventory).build();
 }
 ```
 
-Open API nos va a permitir también generar código de cliente front en type script por ejemplo.
+* index.xml
 
-En este video hemos aprendido como documentar con OpenAPI y poder exponer nuestra API para ser usada con Swagger
-y mantener la documentación y el código de un API REST en el mismo lugar.
-Además podremos utilizar el enfoque "Design First" para pensar nuestra API pública.
+* En recursos podemos utilizar el index.xml, pero en general tendremos una applicacion front
+  que esté en otro puerto, por lo que podemos tener problemas de CORS en javascript. 
+  https://quarkus.io/guides/http-reference#cors-filter
+```properties
+%dev.quarkus.http.cors=true
+```

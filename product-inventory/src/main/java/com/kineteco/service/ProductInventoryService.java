@@ -103,9 +103,14 @@ public class ProductInventoryService {
       inventory.putIfAbsent(productInventory.getSku(), productInventory);
    }
 
-   public void updateProductInventory(String sku, ProductInventory productInventory) {
+   public ProductInventory updateProductInventory(String sku, ProductInventory productInventory) {
+      if (inventory.get(sku) == null) {
+         return null;
+      }
+
       productInventory.setSku(sku);
       inventory.put(sku, productInventory);
+      return productInventory;
    }
 
    public ProductInventory stockUpdate(String sku, Integer stock) {
