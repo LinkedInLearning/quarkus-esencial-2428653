@@ -9,11 +9,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 @Path("/admin")
+@Authenticated
 public class AdminResource {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Path("stats")
+    @RolesAllowed("admin")
     public String adminStats() {
         // Admin task
 
