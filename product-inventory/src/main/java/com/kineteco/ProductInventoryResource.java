@@ -36,6 +36,7 @@ import java.util.Collection;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("/products")
+@ApplicationScoped
 public class ProductInventoryResource {
     private static final Logger LOGGER = Logger.getLogger(ProductInventoryResource.class);
 
@@ -76,10 +77,11 @@ public class ProductInventoryResource {
 
     @POST
     @Consumes(APPLICATION_JSON)
-    public Response createProduct(@Valid @ConvertGroup(to = ValidationGroups.Post.class) ProductInventory productInventory) {
+    public Response createProduct(@Context UriInfo uriInfo, @Valid @ConvertGroup(to = ValidationGroups.Post.class) ProductInventory productInventory) {
         LOGGER.debugf("create %s", productInventory);
         productInventoryService.addProductInventory(productInventory);
-        return Response.created(URI.create(productInventory.getSku())).build();
+        UriBuilder path = uriInfo.getAbsolutePathBuilder().path(productInventory.getSku());
+        return Response.created(path.build()).build();
     }
 
     @PUT
@@ -87,8 +89,12 @@ public class ProductInventoryResource {
     @Consumes(APPLICATION_JSON)
     public Response updateProduct(@PathParam("sku") String sku, @ConvertGroup(to = ValidationGroups.Put.class)  @Valid ProductInventory productInventory) {
         LOGGER.debugf("update %s", productInventory);
-        productInventoryService.updateProductInventory(sku, productInventory);
-        return Response.ok(sku).build();
+        ProductInventory updated = productInventoryService.updateProductInventory(sku, productInventory);
+        if (updated == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(updated).build();
     }
 
     @PATCH
