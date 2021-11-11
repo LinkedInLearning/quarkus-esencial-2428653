@@ -1,7 +1,7 @@
 # Quarkus esencial
 ## 04_05 Consideraciones adicionales para un API REST
 
-* Scope of REST API. Dependent por defecto
+* Scope of REST API. Singleton por defecto
 ```java
 @ApplicationScoped
 ```
