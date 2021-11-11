@@ -13,7 +13,6 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.api.validation.ResteasyViolationException;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.BadRequestException;
@@ -31,7 +30,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Path("/sales")
-@ApplicationScoped
 public class SalesResource {
 
     private static final Logger LOGGER = Logger.getLogger(SalesResource.class);
@@ -83,14 +81,6 @@ public class SalesResource {
         }
 
         return Response.status(Response.Status.BAD_REQUEST).build();
-    }
-
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/secured")
-    public Response createSecuredDeluxeCommand(CustomerCommand command) {
-        return createDeluxeCommand(command);
     }
 
 }
