@@ -35,7 +35,6 @@ import java.util.Collection;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
-@ApplicationScoped
 @Path("/products")
 public class ProductInventoryResource {
     private static final Logger LOGGER = Logger.getLogger(ProductInventoryResource.class);
