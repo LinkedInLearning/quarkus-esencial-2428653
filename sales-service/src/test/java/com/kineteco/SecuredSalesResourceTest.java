@@ -16,7 +16,6 @@ import static io.restassured.RestAssured.given;
 public class SecuredSalesResourceTest {
 
    @Test
-   @TestSecurity(user = "kineteco_partner", roles = { "partner" })
    public void testDeluxePartnerSecured() {
       RequestSpecification request = given()
             .body("{\"sku\": \"secured\", "
@@ -27,7 +26,6 @@ public class SecuredSalesResourceTest {
    }
 
    @Test
-   @TestSecurity(user = "kineteco_customer", roles = { "customer" })
    public void testDeluxeCustomerSecured() {
       RequestSpecification request = given()
             .body("{\"sku\": \"secured\", "
