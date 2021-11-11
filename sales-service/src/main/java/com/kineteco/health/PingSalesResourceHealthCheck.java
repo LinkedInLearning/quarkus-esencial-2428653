@@ -5,11 +5,9 @@ import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.health.Liveness;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 @Liveness
-@ApplicationScoped
 public class PingSalesResourceHealthCheck implements HealthCheck {
 
    @Inject
