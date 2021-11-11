@@ -11,7 +11,6 @@ import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 
 @Readiness
-@ApplicationScoped
 public class ProductInventoryResourceHealthCheck implements HealthCheck {
 
    @Inject

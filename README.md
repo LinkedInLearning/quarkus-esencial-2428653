@@ -27,7 +27,6 @@ http localhost:8080/q/health-ui  #Interfaz gráfica con todos los checks.
   Si no añadimos ApplicationScoped el scope por defecto es @Singleton
 ```java
 @Liveness
-@ApplicationScoped
 public class PingSalesResourceHealthCheck implements HealthCheck {
    @Inject
    SalesResource salesResource;
@@ -43,7 +42,6 @@ public class PingSalesResourceHealthCheck implements HealthCheck {
 * Readiness Sales service
 ```java
 @Readiness
-@ApplicationScoped
 public class ProductInventoryResourceHealthCheck implements HealthCheck {
    @Inject
    @RestClient

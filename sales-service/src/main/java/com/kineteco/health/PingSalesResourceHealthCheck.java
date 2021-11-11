@@ -9,7 +9,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 @Liveness
-@ApplicationScoped
 public class PingSalesResourceHealthCheck implements HealthCheck {
 
    @Inject
