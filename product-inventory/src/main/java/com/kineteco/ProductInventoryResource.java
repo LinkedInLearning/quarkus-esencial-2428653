@@ -72,7 +72,7 @@ public class ProductInventoryResource {
     public Response createProduct(@Valid @ConvertGroup(to = ValidationGroups.Post.class) ProductInventory productInventory) {
         LOGGER.debugf("create %s", productInventory);
         productInventory.persist();
-        return Response.created(URI.create(productInventory.getSku())).build();
+        return Response.created(URI.create(productInventory.sku)).build();
     }
 
     @PUT
@@ -82,8 +82,8 @@ public class ProductInventoryResource {
     public Response updateProduct(@PathParam("sku") String sku, @ConvertGroup(to = ValidationGroups.Put.class)  @Valid ProductInventory productInventory) {
         LOGGER.debugf("update %s", productInventory);
         ProductInventory existingProduct = ProductInventory.findBySku(sku);
-        existingProduct.setName(productInventory.getName());
-        existingProduct.setCategory(productInventory.getCategory());
+        existingProduct.name = productInventory.name;
+        existingProduct.category = productInventory.category;
         existingProduct.persist();
         return Response.accepted(productInventory).build();
     }

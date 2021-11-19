@@ -31,8 +31,8 @@ public class ProductInventoryResourceTest {
               .then()
               .statusCode(Response.Status.OK.getStatusCode())
               .extract().body().as(ProductInventory.class);
-        assertThat(domesticProduct.getSku()).isEqualTo("KE180");
-        assertThat(domesticProduct.getTargetConsumer()).containsExactly(ConsumerType.DOMESTIC);
+        assertThat(domesticProduct.sku).isEqualTo("KE180");
+        assertThat(domesticProduct.targetConsumer).containsExactly(ConsumerType.DOMESTIC);
 
         given().when().get("/products/{sku}", "foo")
               .then()
@@ -48,7 +48,7 @@ public class ProductInventoryResourceTest {
               .body("$.size()", is(53))
               .extract().as(ProductInventory[].class);
         assertThat(inventory).hasSize(53);
-        assertThat(inventory[0].getName()).isEqualTo("K-Eco 180");
+        assertThat(inventory[0].name).isEqualTo("K-Eco 180");
     }
 
     @Test
@@ -65,8 +65,8 @@ public class ProductInventoryResourceTest {
               .then()
               .statusCode(Response.Status.OK.getStatusCode()).extract()
               .body().as(ProductInventory.class);
-        assertThat(createdProduct.getSku()).isEqualTo("123");
-        assertThat(createdProduct.getName()).isEqualTo("product");
+        assertThat(createdProduct.sku).isEqualTo("123");
+        assertThat(createdProduct.name).isEqualTo("product");
 
         given()
               .body("{\"name\": \"Super Product\" }")
@@ -81,8 +81,8 @@ public class ProductInventoryResourceTest {
               .statusCode(Response.Status.OK.getStatusCode()).extract()
               .body().as(ProductInventory.class);
 
-        assertThat(updatedProduct.getSku()).isEqualTo("123");
-        assertThat(updatedProduct.getName()).isEqualTo("Super Product");
+        assertThat(updatedProduct.sku).isEqualTo("123");
+        assertThat(updatedProduct.name).isEqualTo("Super Product");
 
         given().when().delete("/products/{sku}", "123")
               .then()
@@ -113,7 +113,7 @@ public class ProductInventoryResourceTest {
               .statusCode(Response.Status.OK.getStatusCode())
               .extract().body().as(ProductInventory.class);
 
-        assertThat(productInventoryAfter.getUnitsAvailable()).isEqualTo(productInventoryPre.getUnitsAvailable() + 3);
+        assertThat(productInventoryAfter.unitsAvailable).isEqualTo(productInventoryPre.unitsAvailable + 3);
     }
 
     @Test
@@ -142,6 +142,6 @@ public class ProductInventoryResourceTest {
                     .extract().as(ProductInventory[].class);
 
         assertThat(inventory).hasSize(10);
-        assertThat(inventory[0].getName()).isEqualTo("K-Eco 300");
+        assertThat(inventory[0].name).isEqualTo("K-Eco 300");
     }
 }
