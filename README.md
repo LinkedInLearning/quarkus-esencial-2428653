@@ -1,5 +1,5 @@
 # Quarkus esencial
-This is the repository for the LinkedIn Learning course `Quarkus esencial`. The full course is available from [LinkedIn Learning][lil-course-url].
+Este es el repositorio del curso de LinkedIn Learning `Quarkus esencial`. El curso completo está disponible en  [LinkedIn Learning][lil-course-url].
 
 _See the readme file in the main branch for updated instructions and information._
 ## Instrucciones
@@ -27,10 +27,18 @@ Para resolver este problema:
 	
 2. Clona este repositorio en tu equipo local desde el terminal (Mac), CMD (Windows) o una herramienta de la GUI como SourceTree.
 3. [Instrucciones específicas del curso].
+4. 
+### Instructor
+
+**Katia Aresti**
+
+_Principal Software Engineer_
+
+Revisa mis cursos en [LinkedIn Learning](https://www.linkedin.com/learning/instructors/katia-aresti).
 
 
 [0]: # (Replace these placeholder URLs with actual course URLs)
 
-[lil-course-url]: https://www.linkedin.com/learning/
-[lil-thumbnail-url]: http://
+[lil-course-url]: https://www.linkedin.com/learning/quarkus-esencial
+[lil-thumbnail-url]: https://media-exp1.licdn.com/dms/image/C4D0DAQH6Q7aoRj_TUw/learning-public-crop_675_1200/0/1643031644842?e=1644307200&v=beta&t=cdXw73ax5wJR1ISLoSPt3Go0QIpQisADJs5vCO6Cnyk
 
