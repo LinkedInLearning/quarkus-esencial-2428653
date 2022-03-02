@@ -41,5 +41,5 @@ Revisa mis cursos en [LinkedIn Learning](https://www.linkedin.com/learning/instr
 [0]: # (Replace these placeholder URLs with actual course URLs)
 
 [lil-course-url]: https://www.linkedin.com/learning/quarkus-esencial
-[lil-thumbnail-url]: https://media-exp1.licdn.com/dms/image/C4D0DAQH6Q7aoRj_TUw/learning-public-crop_675_1200/0/1643031644842?e=1644307200&v=beta&t=cdXw73ax5wJR1ISLoSPt3Go0QIpQisADJs5vCO6Cnyk
+[lil-thumbnail-url]: https://media-exp1.licdn.com/dms/image/C4D0DAQH6Q7aoRj_TUw/learning-public-crop_675_1200/0/1643031644842?e=1646319600&v=beta&t=peYDoiscPqGHfUsA3Wv6qWKbH3vJOJVXoXti-TPizfA
 
