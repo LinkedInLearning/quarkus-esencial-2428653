@@ -1,7 +1,7 @@
 # Quarkus esencial
 Este es el repositorio del curso de LinkedIn Learning `Quarkus esencial`. El curso completo está disponible en  [LinkedIn Learning][lil-course-url].
 
-![Building a GraphQL Project with React.js][lil-thumbnail-url] 
+![Quarkus esencial][lil-thumbnail-url] 
 Descubre Quarkus, el framework de Java para crear aplicaciones nativas preparadas para Kubernetes. Gracias a este contenido, serás capaz de utilizarlo para crear tus propios sistemas de microservicios eficaces. Tras este curso, sabrás más sobre cómo desarrollar microservicios con Java de forma más eficiente en general, y con Quarkus en particular. Además, se abordarán temas fundamentales para las puestas producción como la tolerancia a fallos, las métricas, las trazas distribuidas y la seguridad.
 ## Instrucciones
 El repositorio tiene branches o ramas para cada video. Para acceder a una específica, puedes ir desde el menú emergente de GitHub, y ver el curso desde esa sección, o bien desde la URL con /tree/BRANCH_NAME.
@@ -41,5 +41,6 @@ Revisa mis cursos en [LinkedIn Learning](https://www.linkedin.com/learning/instr
 [0]: # (Replace these placeholder URLs with actual course URLs)
 
 [lil-course-url]: https://www.linkedin.com/learning/quarkus-esencial
-[lil-thumbnail-url]: https://media-exp1.licdn.com/dms/image/C4D0DAQH6Q7aoRj_TUw/learning-public-crop_675_1200/0/1643031644842?e=1646319600&v=beta&t=peYDoiscPqGHfUsA3Wv6qWKbH3vJOJVXoXti-TPizfA
+[lil-thumbnail-url]: https://media-exp1.licdn.com/dms/image/C4D0DAQH6Q7aoRj_TUw/learning-public-crop_675_1200/0/1643031644842?e
+
 
