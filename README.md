@@ -2,6 +2,7 @@
 Este es el repositorio del curso de LinkedIn Learning `Quarkus esencial`. El curso completo está disponible en  [LinkedIn Learning][lil-course-url].
 
 ![Quarkus esencial][lil-thumbnail-url] 
+
 Descubre Quarkus, el framework de Java para crear aplicaciones nativas preparadas para Kubernetes. Gracias a este contenido, serás capaz de utilizarlo para crear tus propios sistemas de microservicios eficaces. Tras este curso, sabrás más sobre cómo desarrollar microservicios con Java de forma más eficiente en general, y con Quarkus en particular. Además, se abordarán temas fundamentales para las puestas producción como la tolerancia a fallos, las métricas, las trazas distribuidas y la seguridad.
 ## Instrucciones
 El repositorio tiene branches o ramas para cada video. Para acceder a una específica, puedes ir desde el menú emergente de GitHub, y ver el curso desde esa sección, o bien desde la URL con /tree/BRANCH_NAME.
@@ -23,12 +24,8 @@ Para resolver este problema:
 	Commit changes using this command: git commit -m "some message"
 
 ## Instalación
-1. Estos son los requisitos de instalación para poder utilizar los archivos base:
-	- [Lista de los requisitos del curso].
-	
-2. Clona este repositorio en tu equipo local desde el terminal (Mac), CMD (Windows) o una herramienta de la GUI como SourceTree.
-3. [Instrucciones específicas del curso].
-4. 
+1. Clona este repositorio en tu equipo local desde el terminal (Mac), CMD (Windows) o una herramienta de la GUI como SourceTree.
+
 ### Instructor
 
 **Katia Aresti**
@@ -41,6 +38,6 @@ Revisa mis cursos en [LinkedIn Learning](https://www.linkedin.com/learning/instr
 [0]: # (Replace these placeholder URLs with actual course URLs)
 
 [lil-course-url]: https://www.linkedin.com/learning/quarkus-esencial
-[lil-thumbnail-url]: https://media-exp1.licdn.com/dms/image/C4D0DAQH6Q7aoRj_TUw/learning-public-crop_675_1200/0/1643031644842?e
+[lil-thumbnail-url]: https://cdn.lynda.com/course/2428653/2428653-1641824030513-16x9.jpg
 
 
